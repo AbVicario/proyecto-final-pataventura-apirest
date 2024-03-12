@@ -10,6 +10,8 @@ export async function crearCuidador(body: any): Promise<Cuidador> {
     cuidador.apellido = body.apellido;
     cuidador.imagen = body.imagen || "";
     cuidador.alias = body.alias;
+    cuidador.direcciones = []; 
+    cuidador.ofertas = [];
     cuidador.demandas = [];
     cuidador.valoraciones = [];
     return await Cuidador.save(cuidador);

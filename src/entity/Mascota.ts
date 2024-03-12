@@ -2,18 +2,21 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntit
 import { Tutor } from "./Tutor"
 import { Demanda} from "./Demanda"
 import { IsNotEmpty } from "class-validator"
-import { nullable } from "zod"
 
 
 
 @Entity()
-export abstract class Mascota extends BaseEntity{
+export class Mascota extends BaseEntity{
     @PrimaryGeneratedColumn()
     id_mascota: number
-
-    @Column()
+    
+    @Column({unique:true})
     @IsNotEmpty({message: "El nombre de la mascota no puede estar vacio"})
     nombre: string
+
+    @Column()
+    @IsNotEmpty({message: "El numero de chip de la mascota no puede estar vacio"})
+    num_chip: string
 
     @Column({nullable: true})
     edad: number
@@ -30,6 +33,9 @@ export abstract class Mascota extends BaseEntity{
     @Column()
     @IsNotEmpty({message: "El tipo de mascota no puede estar vacio"})
     tipo: string
+
+    @Column({nullable: true})
+    raza: string
 
     @Column()
     @IsNotEmpty({message: "El color que representa a la mascota no puede estar vacio"})

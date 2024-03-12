@@ -1,8 +1,8 @@
-import { Answer } from '../../models/answer'
-import { verfifyPassword } from '../../utils/auth'
+import { Answer } from '../models/answer'
+import { verfifyPassword } from '../utils/auth'
 import { sign } from 'hono/jwt'
 import { setCookie } from 'hono/cookie'
-import { Administrador } from '../../entity/Administrador'
+import { Administrador } from '../entity/Administrador'
 
 
 export const loginAdmin = async (c: any): Promise<Answer> => {
