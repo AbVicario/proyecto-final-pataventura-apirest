@@ -1,4 +1,4 @@
-/*import { Answer } from '../../models/answer'
+import { Answer } from '../../models/answer'
 import { verfifyPassword } from '../../utils/auth'
 import { sign } from 'hono/jwt'
 import { setCookie } from 'hono/cookie'
@@ -61,4 +61,4 @@ export const loginAdmin = async (c: any): Promise<Answer> => {
             ok: false,
         }
     }
-}*/
+}

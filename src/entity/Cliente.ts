@@ -2,14 +2,11 @@ import { Entity, Column, OneToMany, PrimaryGeneratedColumn, Unique, BaseEntity, 
 import { Usuario } from "./Usuario"
 import { IsNotEmpty} from "class-validator"
 
-
-export class Cliente {
+@Entity()
+export abstract class Cliente extends Usuario{
 
     /*@PrimaryGeneratedColumn()
     id_cliente: number*/
-
-    @Column(() => Usuario)
-    usuario: Usuario;
 
     @Column()
     @IsNotEmpty({ message: 'El teléfono no puede estar en blanco'})

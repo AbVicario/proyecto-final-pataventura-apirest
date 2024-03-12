@@ -7,11 +7,8 @@ import { Ubicacion } from "./Ubicacion";
 import { IsNotEmpty } from "class-validator";
 
 @Entity()
-export class Cuidador extends BaseEntity {
+export class Cuidador extends Cliente {
 
-    @Column(() => Cliente)
-    cliente: Cliente;
-  
     @OneToMany(() => Demanda, demanda => demanda.cuidador)
     demandas: Demanda[];
     

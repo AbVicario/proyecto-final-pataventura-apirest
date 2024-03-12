@@ -1,10 +1,11 @@
-/*import { Mascota } from "../../entity/Mascota"
+import { Mascota } from "../../entity/Mascota"
 import { Tutor } from "../../entity/Tutor"
 import { Answer } from "../../models/answer"
 
 export const guardarMascota = async (c: any): Promise<Answer> =>{
     const idTutor = c.req.param('id_tutor')
     const body = await c.rec.json()
+    const tipo = body.tipo
     try {
         const tutor = await Tutor.findOneBy({id_usuario:idTutor})
         if(!tutor){
@@ -14,7 +15,7 @@ export const guardarMascota = async (c: any): Promise<Answer> =>{
                 ok: false, 
             }
         }else{
-            const mascota = new Mascota() 
+            const mascota = new tipo() 
             mascota.nombre = body.nombre;
             mascota.edad = body.edad || 0;
             mascota.imagen = body.imagen || "";
@@ -51,7 +52,7 @@ export const guardarMascota = async (c: any): Promise<Answer> =>{
             ok: false,
         }
     }
-}*/
+}
 
 
 

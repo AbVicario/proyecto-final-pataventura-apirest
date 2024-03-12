@@ -9,18 +9,13 @@ export class Ubicacion extends BaseEntity{
     @PrimaryGeneratedColumn()
     id_ubicacion:number
 
-    @Column('numeric')
-    @IsNumber({}, {message: "El campo longitud debe ser un numero valido"})
-    longitud: number
+    @Column('point')
+    coordenadas: string;
+    
+    @ManyToOne(() => Tutor, tutor => tutor.direcciones, { nullable: true })
+    tutor: Tutor;
 
-    @Column('numeric')
-    @IsNumber({}, {message: "El campo latitud debe ser un numero valido"})
-    latidud: number
-
-    @ManyToOne((nullable: true) => Tutor, tutor => tutor.direcciones)
-    tutor: Tutor 
-
-    @ManyToOne((nullable: true) => Cuidador, cuidador => cuidador.direcciones)
-    cuidador: Cuidador 
+    @ManyToOne(() => Cuidador, cuidador => cuidador.direcciones, { nullable: true })
+    cuidador: Cuidador;
     
 }

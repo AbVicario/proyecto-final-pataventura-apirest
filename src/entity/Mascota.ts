@@ -7,7 +7,7 @@ import { nullable } from "zod"
 
 
 @Entity()
-export class Mascota extends BaseEntity{
+export abstract class Mascota extends BaseEntity{
     @PrimaryGeneratedColumn()
     id_mascota: number
 
