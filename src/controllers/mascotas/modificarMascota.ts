@@ -1,11 +1,12 @@
-/*import { Mascota } from "../../entity/Mascota";
+import { Mascota } from "../../entity/Mascota";
 import { Answer } from "../../models/answer";
 
 export const modificarMascota = async (c: any): Promise<Answer> => {
     try {
         const body = await c.req.json();
         const id = c.req.param('id_mascota')
-        const mascota = await Mascota.findOneBy({id_mascota : id});
+        const tipo = body.tipo
+        const mascota = await tipo.findOneBy({id_mascota : id});
         
         if (!mascota) {
             return {
@@ -24,7 +25,7 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
             mascota.tipo = body.tipo;
             mascota.observacion = body.observacion;
     
-            const mascotaActualizada = await Mascota.save(mascota);
+            const mascotaActualizada = await tipo.save(mascota);
 
             if (mascotaActualizada) {
                 return {
@@ -49,4 +50,4 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
             ok: false,
         };
     }
-};*/
+};

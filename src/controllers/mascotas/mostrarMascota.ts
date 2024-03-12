@@ -1,13 +1,14 @@
 
-/*import { Mascota } from "../../entity/Mascota";
+import { Mascota } from "../../entity/Mascota";
 import { Answer } from "../../models/answer";
 
 export const mostrarMascota = async(c:any): Promise<Answer> =>{
 
     const id = c.req.param('id_mascota')
+    const tipo = c.req.param('tipo')
 
     try {
-        const mascota = await Mascota.findOneBy({id_mascota: id });
+        const mascota = await tipo.findOneBy({id_mascota: id });
         if(mascota){
             return {
                 data: mascota,
@@ -30,4 +31,4 @@ export const mostrarMascota = async(c:any): Promise<Answer> =>{
             ok: false,
         }
     }
-}*/
+}

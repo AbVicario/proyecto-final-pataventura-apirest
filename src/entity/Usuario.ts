@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Unique } from "typeorm";
 import { IsEmail, IsNotEmpty, Length } from "class-validator";
 
-
-export class Usuario {
+@Entity()
+export abstract class Usuario extends BaseEntity{
 
     @PrimaryGeneratedColumn()
     id_usuario: number;

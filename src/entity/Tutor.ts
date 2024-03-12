@@ -7,10 +7,7 @@ import { IsNotEmpty } from "class-validator";
 
 
 @Entity()
-export class Tutor extends BaseEntity {
-
-    @Column(() => Cliente)
-    cliente: Cliente;
+export class Tutor extends Cliente {
 
     @OneToMany(() => Mascota, mascota => mascota.tutor)
     mascotas: Mascota[]
@@ -18,7 +15,7 @@ export class Tutor extends BaseEntity {
     @OneToMany(() => Valoracion, valoracion => valoracion.tutor)
     valoraciones: Valoracion[]
 
-    @OneToMany(() => Ubicacion, ubicacion => ubicacion.tutor)
+    @OneToMany(type => Ubicacion, ubicacion => ubicacion.tutor, {cascade: true})
     @IsNotEmpty({ message: 'La direccion  no puede estar en blanco'})
     direcciones:Ubicacion[]
 }

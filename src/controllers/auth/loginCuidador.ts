@@ -1,5 +1,5 @@
 
-/*import { Answer } from "../../models/answer"
+import { Answer } from "../../models/answer"
 import { sign } from 'hono/jwt'
 import { verfifyPassword } from "../../utils/auth"
 import { Cuidador } from "../../entity/Cuidador"
@@ -48,4 +48,4 @@ export const loginCuidador = async (c: any): Promise<Answer> => {
         status: 200,
         ok: true,
     }
-}*/
+}
