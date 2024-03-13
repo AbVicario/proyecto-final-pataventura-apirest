@@ -1,7 +1,8 @@
+import { QueryRunner } from "typeorm";
 import { Cuidador } from "../entity/Cuidador";
 import { hashPassword } from "../utils/auth";
 
-export async function crearCuidador(body: any): Promise<Cuidador> {
+export async function crearCuidador(body: any, queryRunner: QueryRunner): Promise<Cuidador> {
     const cuidador = new Cuidador();
     cuidador.email = body.email;
     cuidador.password = await hashPassword(body.password);
@@ -10,9 +11,9 @@ export async function crearCuidador(body: any): Promise<Cuidador> {
     cuidador.apellido = body.apellido;
     cuidador.imagen = body.imagen || "";
     cuidador.alias = body.alias;
-    cuidador.direcciones = []; 
+    cuidador.direcciones = [];
     cuidador.ofertas = [];
     cuidador.demandas = [];
     cuidador.valoraciones = [];
-    return await Cuidador.save(cuidador);
+    return await queryRunner.manager.save(cuidador);
 }

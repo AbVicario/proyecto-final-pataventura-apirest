@@ -1,38 +1,39 @@
 import { crearMascota } from "../dao/mascotasDao";
+import { setupDataSource } from "../db/connection";
 import { Demanda } from "../entity/Demanda";
 import { Mascota } from "../entity/Mascota";
 import { Tutor } from "../entity/Tutor";
 import { Answer } from "../models/answer";
 
-export const eliminarMascota = async(c:any): Promise<Answer> =>{
+export const eliminarMascota = async (c: any): Promise<Answer> => {
 
     const id = c.req.param('id_mascota')
 
 
     try {
-        const mascota = await Mascota.findOneBy({id_mascota:id})
-        if(!mascota){
+        const mascota = await Mascota.findOneBy({ id_mascota: id })
+        if (!mascota) {
             return {
                 data: "No existe esa mascota",
                 status: 404,
                 ok: false,
             }
-        }else{
+        } else {
             for (const demanda of mascota.demandas) {
-                if(demanda.estado.toLowerCase() == "aceptada" 
-                || demanda.estado.toLowerCase() == "pendiente"){
+                if (demanda.estado.toLowerCase() == "aceptada"
+                    || demanda.estado.toLowerCase() == "pendiente") {
                     demanda.estado = "cancelada_por_tutor"
                     Demanda.save(demanda)
-                }  
+                }
             }
             const eliminada = await Mascota.remove(mascota)
-            if(eliminada){
+            if (eliminada) {
                 return {
                     data: "La mascota se elimino correctamente",
                     status: 200,
                     ok: true,
                 }
-            }else{
+            } else {
                 return {
                     data: "La mascota no se elimino correctamente",
                     status: 404,
@@ -40,7 +41,7 @@ export const eliminarMascota = async(c:any): Promise<Answer> =>{
                 }
             }
         }
-         
+
     } catch (error) {
         console.log('error:' + error)
         return {
@@ -51,23 +52,30 @@ export const eliminarMascota = async(c:any): Promise<Answer> =>{
     }
 }
 
-export const guardarMascota = async (c: any): Promise<Answer> =>{
+export const guardarMascota = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
-    const id = payload.id_usuario  
+    const id = payload.id_usuario
     const body = await c.req.json()
+    const dataSource = await setupDataSource()
+    const queryRunner = dataSource.createQueryRunner()
+
     try {
-        const tutor = await Tutor.findOneBy({id_usuario:id})
+        await queryRunner.connect()
+        const tutor = await Tutor.findOneBy({ id_usuario: id })
+        await queryRunner.startTransaction()
+
 
         console.log(tutor);
-        
-        if(!tutor){
-            return{
+
+        if (!tutor) {
+            return {
                 data: 'No existe el tutor',
                 status: 404,
-                ok: false, 
+                ok: false,
             }
         } else {
-            const mascota = await crearMascota(body, tutor);
+            const mascota = await crearMascota(body, tutor, queryRunner);
+            await queryRunner.commitTransaction()
 
             console.log(mascota);
 
@@ -85,13 +93,16 @@ export const guardarMascota = async (c: any): Promise<Answer> =>{
                 }
             }
         }
-        
+
     } catch (error) {
+        await queryRunner.rollbackTransaction()
         return {
             data: 'Error al procesar la solicitud' + error,
             status: 422,
             ok: false,
         }
+    } finally {
+        await queryRunner.release()
     }
 }
 
@@ -99,15 +110,15 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
     try {
         const body = await c.req.json();
         const id = c.req.param('id_mascota')
-        const mascota = await Mascota.findOneBy({id_mascota : id});
-        
+        const mascota = await Mascota.findOneBy({ id_mascota: id });
+
         if (!mascota) {
             return {
                 data: "La mascota no existe",
                 status: 404,
                 ok: false,
             };
-        }else{
+        } else {
 
             mascota.nombre = body.nombre;
             mascota.edad = body.edad;
@@ -117,7 +128,7 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
             mascota.color = body.color;
             mascota.tipo = body.tipo;
             mascota.observacion = body.observacion;
-    
+
             const mascotaActualizada = await mascota.save();
 
             if (mascotaActualizada) {
@@ -145,26 +156,26 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
     }
 }
 
-export const mostrarMascota = async(c:any): Promise<Answer> =>{
+export const mostrarMascota = async (c: any): Promise<Answer> => {
 
     const id = c.req.param('id_mascota')
 
     try {
-        const mascota = await Mascota.findOneBy({id_mascota: id });
-        if(mascota){
+        const mascota = await Mascota.findOneBy({ id_mascota: id });
+        if (mascota) {
             return {
                 data: mascota,
                 status: 200,
                 ok: true,
             }
-        }else{
+        } else {
             return {
                 data: "No existe mascota con ese id",
                 status: 404,
                 ok: false,
             }
         }
-       
+
     } catch (error) {
         console.log('error:' + error)
         return {
@@ -175,27 +186,27 @@ export const mostrarMascota = async(c:any): Promise<Answer> =>{
     }
 }
 
-export const mostrarMascotas = async(c:any): Promise<Answer> =>{
+export const mostrarMascotas = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
-    const id = payload.id_usuario  
+    const id = payload.id_usuario
 
     try {
-        
-        const mascotas = await Mascota.findBy({tutor:{id_usuario: id}})
-        if(mascotas){
+
+        const mascotas = await Mascota.findBy({ tutor: { id_usuario: id } })
+        if (mascotas) {
             return {
                 data: mascotas,
                 status: 200,
                 ok: true,
             }
-        }else{
+        } else {
             return {
                 data: "El tutor no tiene mascotas",
                 status: 404,
                 ok: false,
             }
         }
-       
+
     } catch (error) {
         console.log('error:' + error)
         return {
