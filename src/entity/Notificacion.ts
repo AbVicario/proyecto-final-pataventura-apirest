@@ -1,8 +1,8 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Demanda } from "./Demanda";
 
 @Entity()
-export class Notificacion {
+export class Notificacion extends BaseEntity {
     @PrimaryGeneratedColumn()
     id_alerta: number
 
