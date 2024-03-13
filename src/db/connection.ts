@@ -14,6 +14,7 @@ import { Ubicacion } from '../entity/Ubicacion';
 import { Tutor } from '../entity/Tutor';
 import { Cuidador } from '../entity/Cuidador';
 import { Oferta } from '../entity/Oferta';
+import { Notificacion } from '../entity/Notificacion';
 
 
 export async function setupDataSource(): Promise<DataSource> {
@@ -26,7 +27,7 @@ export async function setupDataSource(): Promise<DataSource> {
         database: "pataventura",
         synchronize: true,
         logging: false,
-        entities: [Usuario, Administrador, Cliente, Valoracion, Mascota, Contrato, Demanda,
+        entities: [Usuario, Administrador, Cliente, Valoracion, Mascota, Contrato, Demanda, Notificacion,
             Oferta, Cuidador, Tutor, Ubicacion],
         migrations: [],
         subscribers: [],
