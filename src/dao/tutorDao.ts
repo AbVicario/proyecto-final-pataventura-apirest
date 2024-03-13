@@ -1,7 +1,8 @@
+import { QueryRunner } from "typeorm";
 import { Tutor } from "../entity/Tutor";
 import { hashPassword } from "../utils/auth";
 
-export async function crearTutor(body: any): Promise<Tutor> {
+export async function crearTutor(body: any, queryRunner: QueryRunner): Promise<Tutor> {
     const tutor = new Tutor();
     tutor.email = body.email;
     tutor.password = await hashPassword(body.password);
@@ -14,5 +15,5 @@ export async function crearTutor(body: any): Promise<Tutor> {
     tutor.mascotas = [];
     tutor.valoraciones = [];
     tutor.direcciones = [];
-    return await Tutor.save(tutor);
+    return await queryRunner.manager.save(tutor);
 }

@@ -1,12 +1,13 @@
 
+import { QueryRunner } from "typeorm";
 import { Mascota } from "../entity/Mascota";
 import { Tutor } from "../entity/Tutor";
 
-export async function crearMascota(body: any, tutor: Tutor): Promise<Mascota> {
-    
+export async function crearMascota(body: any, tutor: Tutor, queryRunner: QueryRunner): Promise<Mascota> {
+
         const mascota = new Mascota()
         mascota.nombre = body.nombre;
-        mascota.num_chip = body.num_chip; 
+        mascota.num_chip = body.num_chip;
         mascota.edad = body.edad || 0;
         mascota.imagen = body.imagen || "";
         mascota.tamanyo = body.tamanyo || 0;
@@ -18,5 +19,5 @@ export async function crearMascota(body: any, tutor: Tutor): Promise<Mascota> {
         mascota.tutor = tutor;
         mascota.demandas = [];
         mascota.raza = body.raza || "";
-        return await mascota.save();
+        return await queryRunner.manager.save(mascota);
 }
