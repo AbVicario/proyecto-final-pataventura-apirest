@@ -4,63 +4,39 @@ import { cors } from 'hono/cors'
 import { jwt } from 'hono/jwt'
 import 'dotenv/config'
 import "reflect-metadata"
-import { DataSource } from "typeorm"
-import { Usuario } from "./entity/Usuario"
-import { Administrador } from "./entity/Administrador"
-import { Cliente } from "./entity/Cliente"
-import { Valoracion } from "./entity/Valoracion"
-import { Mascota } from "./entity/Mascota"
-import { Contrato } from "./entity/Contrato"
-import { Demanda} from "./entity/Demanda"
-import { Oferta } from "./entity/Oferta"
-import { Tutor } from "./entity/Tutor"
-import { Ubicacion } from "./entity/Ubicacion"
-import { Cuidador } from './entity/Cuidador'
 import { authMiddleware } from './midelware/authMiddleware.ts'
 import mascota from './routes/mascotaRoutes'
 import cliente from './routes/clienteRoutes'
+import { setupDataSource } from './db/connection'
 
 (async () => {
 
-  const AppDataSource = new DataSource({
-    type: "postgres",
-    host: "localhost",
-    port: 5432,
-    username: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: "pataventura",
-    synchronize: true,
-    logging: false,
-    entities: [Usuario, Administrador, Cliente, Valoracion, Mascota, Contrato, Demanda,
-     Oferta, Cuidador, Tutor, Ubicacion],
-    migrations: [],
-    subscribers: [],
-  });
-  await AppDataSource.initialize()
+  const dataSource = await setupDataSource();
+  await dataSource.initialize();
 
   const app = new Hono()
 
   console.log(app);
-  
+
 
   app.use(
     '/api/admin/*',
     jwt({
-        secret: process.env.JWT_SECRET!!,
-        cookie: 'jwt',
+      secret: process.env.JWT_SECRET!!,
+      cookie: 'jwt',
     })
-)
+  )
 
   app.use(
     '/api/*',
     cors({
-        origin: '*',
-        allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
-        credentials: true,
+      origin: '*',
+      allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
+      credentials: true,
     })
-)
+  )
 
-  app.use('/api/cliente/*', authMiddleware) 
+  app.use('/api/cliente/*', authMiddleware)
   app.route('/', cliente)
   app.route('/api/cliente/mascota', mascota)
 
