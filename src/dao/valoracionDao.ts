@@ -1,14 +1,12 @@
 import { QueryRunner } from "typeorm";
-import { Cuidador } from "../entity/Cuidador";
-import { Tutor } from "../entity/Tutor";
 import { Valoracion } from "../entity/Valoracion";
+import { Demanda } from "../entity/Demanda";
 
-export async function crearValoracion(body: any, cuidador: Cuidador, tutor: Tutor, queryRunner: QueryRunner): Promise<Valoracion | null> {
+export async function crearValoracion(body: any, demanda: Demanda, queryRunner: QueryRunner): Promise<Valoracion | null> {
     const valoración = new Valoracion()
     valoración.puntuacion = body.puntuacion
     valoración.descripcion = body.descripcion
-    valoración.cuidador = cuidador
-    valoración.tutor = tutor
+    valoración.demanda = demanda
 
     return queryRunner.manager.save(valoración)
 }
