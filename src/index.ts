@@ -7,7 +7,9 @@ import "reflect-metadata"
 import { authMiddleware } from './midelware/authMiddleware.ts'
 import mascota from './routes/mascotaRoutes'
 import cliente from './routes/clienteRoutes'
+import valoracion from './routes/valoracionRoutes'
 import { setupDataSource } from './db/connection'
+
 
 (async () => {
 
@@ -39,6 +41,7 @@ import { setupDataSource } from './db/connection'
   app.use('/api/cliente/*', authMiddleware)
   app.route('/', cliente)
   app.route('/api/cliente/mascota', mascota)
+  app.route('/api/cliente/valoracion', valoracion)
 
   const port = parseInt(process.env.PORT) || 8000
   console.log(`Server is running on  ${port}`)

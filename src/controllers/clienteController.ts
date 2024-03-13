@@ -156,3 +156,4 @@ export const registroCuidador = async (c: any): Promise<Answer> => {
         await queryRunner.release()
     }
 };
+
