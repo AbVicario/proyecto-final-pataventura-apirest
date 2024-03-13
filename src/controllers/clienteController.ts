@@ -12,6 +12,7 @@ import { crearOferta } from "../dao/ofertaDao"
 import { QueryRunner } from "typeorm"
 import { setupDataSource } from "../db/connection"
 import { log } from "console"
+import { queryRunnerCreate } from "../db/queryRunner"
 
 
 
@@ -107,11 +108,8 @@ export const loginTutor = async (c: any): Promise<Answer> => {
 //Haciendo pruebas del registro descubrí que se insertaba el objeto tutor sin mascota.
 // Lo arreglé modificando el controlador añadiendo un rollback a la transaccion con los recursos que me da typeORM 
 export const registroTutor = async (c: any): Promise<Answer> => {
-    const dataSource = await setupDataSource()
-    await dataSource.initialize()
-    const queryRunner = dataSource.createQueryRunner()
-    await queryRunner.connect()
-    await queryRunner.startTransaction()
+
+    const queryRunner = await queryRunnerCreate()
 
     try {
         const body = await c.req.json();
@@ -139,11 +137,9 @@ export const registroTutor = async (c: any): Promise<Answer> => {
 
 
 export const registroCuidador = async (c: any): Promise<Answer> => {
-    const dataSource = await setupDataSource()
-    const queryRunner = dataSource.createQueryRunner()
+    const queryRunner = await queryRunnerCreate()
     try {
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+
         const body = await c.req.json();
         const cuidador = await crearCuidador(body, queryRunner);
         const ubicacion = await crearUbicacionCuidador(body, cuidador, queryRunner);

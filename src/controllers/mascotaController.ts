@@ -1,5 +1,6 @@
 import { crearMascota } from "../dao/mascotasDao";
 import { setupDataSource } from "../db/connection";
+import { queryRunnerCreate } from "../db/queryRunner";
 import { Demanda } from "../entity/Demanda";
 import { Mascota } from "../entity/Mascota";
 import { Tutor } from "../entity/Tutor";
@@ -8,8 +9,7 @@ import { Answer } from "../models/answer";
 export const eliminarMascota = async (c: any): Promise<Answer> => {
 
     const id = c.req.param('id_mascota')
-
-
+    const queryRunner = await queryRunnerCreate()
     try {
         const mascota = await Mascota.findOneBy({ id_mascota: id })
         if (!mascota) {
@@ -23,10 +23,11 @@ export const eliminarMascota = async (c: any): Promise<Answer> => {
                 if (demanda.estado.toLowerCase() == "aceptada"
                     || demanda.estado.toLowerCase() == "pendiente") {
                     demanda.estado = "cancelada_por_tutor"
-                    Demanda.save(demanda)
+                    await queryRunner.manager.save(demanda)
                 }
             }
-            const eliminada = await Mascota.remove(mascota)
+            const eliminada = await queryRunner.manager.remove(mascota)
+            await queryRunner.commitTransaction()
             if (eliminada) {
                 return {
                     data: "La mascota se elimino correctamente",
@@ -42,13 +43,17 @@ export const eliminarMascota = async (c: any): Promise<Answer> => {
             }
         }
 
+
     } catch (error) {
         console.log('error:' + error)
+        await queryRunner.rollbackTransaction()
         return {
             data: error,
             status: 400,
             ok: false,
         }
+    } finally {
+        await queryRunner.release()
     }
 }
 
@@ -56,16 +61,10 @@ export const guardarMascota = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
     const id = payload.id_usuario
     const body = await c.req.json()
-    const dataSource = await setupDataSource()
-    const queryRunner = dataSource.createQueryRunner()
+    const queryRunner = await queryRunnerCreate()
 
     try {
-        await queryRunner.connect()
         const tutor = await Tutor.findOneBy({ id_usuario: id })
-        await queryRunner.startTransaction()
-
-
-        console.log(tutor);
 
         if (!tutor) {
             return {
