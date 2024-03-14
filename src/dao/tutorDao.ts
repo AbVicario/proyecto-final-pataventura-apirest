@@ -13,7 +13,6 @@ export async function crearTutor(body: any, queryRunner: QueryRunner): Promise<T
     tutor.imagen = body.imagen || "";
     tutor.alias = body.alias;
     tutor.mascotas = [];
-    tutor.valoraciones = [];
     tutor.direcciones = [];
     return await queryRunner.manager.save(tutor);
 }

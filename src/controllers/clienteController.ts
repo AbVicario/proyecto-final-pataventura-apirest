@@ -9,12 +9,7 @@ import { crearUbicacionCuidador, crearUbicacionTutor } from "../dao/ubicacionDao
 import { crearMascota } from "../dao/mascotasDao"
 import { crearCuidador } from "../dao/cuidadorDao"
 import { crearOferta } from "../dao/ofertaDao"
-import { QueryRunner } from "typeorm"
-import { setupDataSource } from "../db/connection"
-import { log } from "console"
 import { queryRunnerCreate } from "../db/queryRunner"
-
-
 
 export const loginCuidador = async (c: any): Promise<Answer> => {
 
