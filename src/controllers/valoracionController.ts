@@ -82,9 +82,8 @@ export const eliminarValoracion = async (id_valoracion: number): Promise<Answer>
 }
 
 export const mostrarValoraciones = async (id_demanda: number): Promise<Answer> => {
-    //Revisar 
+    //revisar (sin acabar)
     try {
-        //const cuidador = await Cuidador.findOneBy({})
         const valoraciones = await Valoracion.findBy({ demanda: { id_demanda: id_demanda } })
         if (valoraciones) {
             return {
