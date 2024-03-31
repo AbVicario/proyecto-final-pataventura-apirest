@@ -11,8 +11,4 @@ export class Tutor extends Cliente {
 
     @OneToMany(() => Mascota, mascota => mascota.tutor)
     mascotas: Mascota[]
-
-    @OneToMany(type => Ubicacion, ubicacion => ubicacion.tutor, { cascade: true })
-    @IsNotEmpty({ message: 'La direccion  no puede estar en blanco' })
-    direcciones: Ubicacion[]
 }

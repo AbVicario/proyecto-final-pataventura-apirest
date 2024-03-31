@@ -15,7 +15,6 @@ export const loginAdmin = async (c: any): Promise<Answer> => {
 
     const body = await c.req.json()
 
-   
 
     try {
         const administrador = await Administrador.findOneBy({

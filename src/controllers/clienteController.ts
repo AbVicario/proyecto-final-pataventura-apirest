@@ -10,6 +10,9 @@ import { crearMascota } from "../dao/mascotasDao"
 import { crearCuidador } from "../dao/cuidadorDao"
 import { crearOferta } from "../dao/ofertaDao"
 import { queryRunnerCreate } from "../db/queryRunner"
+import { encontrarUsuariosCercanos } from "../utils/encontarUsuarios"
+import { Ubicacion } from "../entity/Ubicacion"
+import { Oferta } from "../entity/Oferta"
 
 export const loginCuidador = async (c: any): Promise<Answer> => {
 
@@ -109,8 +112,8 @@ export const registroTutor = async (c: any): Promise<Answer> => {
     try {
         const body = await c.req.json();
         const tutor = await crearTutor(body, queryRunner);
-        const ubicacion = await crearUbicacionTutor(body, tutor, queryRunner);
-        if (ubicacion) tutor.direcciones.push(ubicacion)
+        await crearUbicacionTutor(body, tutor, queryRunner);
+
 
         const mascota = await crearMascota(body, tutor, queryRunner);
 
@@ -129,16 +132,14 @@ export const registroTutor = async (c: any): Promise<Answer> => {
     }
 };
 
-
-
 export const registroCuidador = async (c: any): Promise<Answer> => {
     const queryRunner = await queryRunnerCreate()
     try {
 
         const body = await c.req.json();
         const cuidador = await crearCuidador(body, queryRunner);
-        const ubicacion = await crearUbicacionCuidador(body, cuidador, queryRunner);
-        if (ubicacion) cuidador.direcciones.push(ubicacion)
+        await crearUbicacionCuidador(body, cuidador, queryRunner);
+
         const oferta = await crearOferta(body, cuidador, queryRunner);
         if (oferta) cuidador.ofertas.push(oferta)
         await queryRunner.commitTransaction()
@@ -151,4 +152,28 @@ export const registroCuidador = async (c: any): Promise<Answer> => {
         await queryRunner.release()
     }
 };
+
+export const mostrarCuidadores = async (c: any): Promise<Answer> => {
+    const tipo = c.req.param('tipo')
+    try {
+        const cuidadores = await Cuidador.createQueryBuilder("cuidador").innerJoin("cuidador.ofertas", "oferta").where("oferta.tipo = :tipo", { tipo }).getMany()
+
+        if (cuidadores.length <= 0) {
+            return {
+                data: "No se encuentran cuidadores del tipo: " + tipo,
+                status: 404,
+                ok: false
+            }
+        } else {
+            return {
+                data: cuidadores,
+                status: 200,
+                ok: true
+            }
+        }
+    } catch (error) {
+        return { data: error.message, status: 500, ok: false };
+    }
+}
+
 

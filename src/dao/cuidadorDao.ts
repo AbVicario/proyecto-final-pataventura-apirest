@@ -11,7 +11,6 @@ export async function crearCuidador(body: any, queryRunner: QueryRunner): Promis
     cuidador.apellido = body.apellido;
     cuidador.imagen = body.imagen || "";
     cuidador.alias = body.alias;
-    cuidador.direcciones = [];
     cuidador.ofertas = [];
     cuidador.demandas = [];
     return await queryRunner.manager.save(cuidador);
