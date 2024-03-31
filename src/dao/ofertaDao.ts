@@ -8,6 +8,7 @@ export async function crearOferta(body: any, cuidador: Cuidador, queryRunner: Qu
     oferta.tipo = body.tipoOferta;
     oferta.descripcion = body.descripcion;
     oferta.precio = body.precio;
+    oferta.radio = body.radio;
     oferta.cuidador = cuidador;
     return await queryRunner.manager.save(oferta);
 }
