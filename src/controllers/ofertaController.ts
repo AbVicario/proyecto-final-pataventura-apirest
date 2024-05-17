@@ -7,10 +7,11 @@ import { Answer } from "../models/answer"
 export const guardarOferta = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
     const id_cuidador = payload.id_usuario
+    console.log(id_cuidador)
     const body = await c.req.json()
+    console.log(body)
     const queryRunner = await queryRunnerCreate()
     try {
-        queryRunner.startTransaction()
         const cuidador = await Cuidador.findOneBy(id_cuidador)
         const ofertas = await Oferta.findBy({ cuidador: { id_usuario: id_cuidador } })
         let existe = false
@@ -27,6 +28,7 @@ export const guardarOferta = async (c: any): Promise<Answer> => {
             }
         } else {
             const oferta = await crearOferta(body, cuidador, queryRunner)
+            await queryRunner.commitTransaction()
             if (oferta) {
                 return {
                     data: "Oferta creada con exito",
@@ -44,14 +46,14 @@ export const guardarOferta = async (c: any): Promise<Answer> => {
 
     } catch (error) {
         console.log('error:', error);
-        queryRunner.rollbackTransaction()
+        await queryRunner.rollbackTransaction()
         return {
             data: error.message,
             status: 400,
             ok: false,
         }
     } finally {
-        queryRunner.release()
+        await queryRunner.release()
     }
 }
 
@@ -139,7 +141,8 @@ export const modificarOferta = async (c: any): Promise<Answer> => {
 }
 
 export const mostrarOfertas = async (c: any): Promise<Answer> => {
-    const payload = c.get('jwtPayLoad')
+    const payload = await c.get('jwtPayload')
+    console.log(payload)
     const id_cuidador = payload.id_usuario
 
     try {

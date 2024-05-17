@@ -7,11 +7,12 @@ export async function crearTutor(body: any, queryRunner: QueryRunner): Promise<T
     tutor.email = body.email;
     tutor.password = await hashPassword(body.password);
     tutor.telefono = body.telefono;
-    console.log(tutor.telefono);
     tutor.nombre = body.nombre;
     tutor.apellido = body.apellido;
     tutor.imagen = body.imagen || "";
     tutor.alias = body.alias;
+    tutor.direccion = body.direccion
     tutor.mascotas = [];
+    console.log("ENtrraaahahha")
     return await queryRunner.manager.save(tutor);
 }

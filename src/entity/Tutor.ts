@@ -1,14 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, ChildEntity, BaseEntity, Column } from "typeorm"
+import { Entity, OneToMany } from "typeorm"
 import { Cliente } from "./Cliente";
 import { Mascota } from "./Mascota";
-import { Valoracion } from "./Valoracion";
-import { Ubicacion } from "./Ubicacion";
-import { IsNotEmpty } from "class-validator";
+import { nullable } from "zod";
+
 
 
 @Entity()
 export class Tutor extends Cliente {
 
-    @OneToMany(() => Mascota, mascota => mascota.tutor)
+    @OneToMany(() => Mascota, mascota => mascota.tutor, { nullable: true })
     mascotas: Mascota[]
 }

@@ -19,7 +19,7 @@ app.put('/:tipo', async (c) => {
 
 })
 
-app.get(async (c) => {
+app.get("/all", async (c) => {
     const result = await mostrarOfertas(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 

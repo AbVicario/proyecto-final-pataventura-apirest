@@ -45,7 +45,6 @@ export const eliminarMascota = async (c: any): Promise<Answer> => {
 
 
     } catch (error) {
-        console.log('error:' + error)
         await queryRunner.rollbackTransaction()
         return {
             data: error,
@@ -65,6 +64,7 @@ export const guardarMascota = async (c: any): Promise<Answer> => {
 
     try {
         const tutor = await Tutor.findOneBy({ id_usuario: id })
+        console.log("tutor:" + tutor)
 
         if (!tutor) {
             return {
@@ -146,7 +146,6 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
         }
 
     } catch (error) {
-        console.log('error:', error);
         return {
             data: error.message,
             status: 400,
@@ -176,7 +175,6 @@ export const mostrarMascota = async (c: any): Promise<Answer> => {
         }
 
     } catch (error) {
-        console.log('error:' + error)
         return {
             data: error,
             status: 400,
@@ -192,6 +190,7 @@ export const mostrarMascotas = async (c: any): Promise<Answer> => {
     try {
 
         const mascotas = await Mascota.findBy({ tutor: { id_usuario: id } })
+        console.log(mascotas)
         if (mascotas) {
             return {
                 data: mascotas,
@@ -207,7 +206,7 @@ export const mostrarMascotas = async (c: any): Promise<Answer> => {
         }
 
     } catch (error) {
-        console.log('error:' + error)
+
         return {
             data: error,
             status: 400,

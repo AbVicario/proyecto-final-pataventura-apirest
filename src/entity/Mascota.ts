@@ -10,16 +10,16 @@ export class Mascota extends BaseEntity {
     @PrimaryGeneratedColumn()
     id_mascota: number
 
-    @Column({ unique: true })
+    @Column()
     @IsNotEmpty({ message: "El nombre de la mascota no puede estar vacio" })
     nombre: string
 
-    @Column()
+    @Column({ unique: true })
     @IsNotEmpty({ message: "El numero de chip de la mascota no puede estar vacio" })
     num_chip: string
 
     @Column({ nullable: true })
-    edad: number
+    edad: string
 
     @Column({ nullable: true })
     imagen: string

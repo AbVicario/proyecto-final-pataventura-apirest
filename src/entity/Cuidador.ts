@@ -6,9 +6,9 @@ import { Oferta } from "./Oferta";
 @Entity()
 export class Cuidador extends Cliente {
 
-    @OneToMany(() => Demanda, demanda => demanda.cuidador)
+    @OneToMany(() => Demanda, demanda => demanda.cuidador, { nullable: true })
     demandas: Demanda[];
 
-    @OneToMany(() => Oferta, oferta => oferta.cuidador)
+    @OneToMany(() => Oferta, oferta => oferta.cuidador, { nullable: true })
     ofertas: Oferta[];
 } 

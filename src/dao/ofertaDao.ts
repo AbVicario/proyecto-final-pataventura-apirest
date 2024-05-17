@@ -5,7 +5,7 @@ import { QueryRunner } from "typeorm";
 
 export async function crearOferta(body: any, cuidador: Cuidador, queryRunner: QueryRunner): Promise<Oferta | null> {
     const oferta = new Oferta();
-    oferta.tipo = body.tipoOferta;
+    oferta.tipo = body.tipo;
     oferta.descripcion = body.descripcion;
     oferta.precio = body.precio;
     oferta.radio = body.radio;

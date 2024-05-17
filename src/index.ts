@@ -1,4 +1,7 @@
-import { serve } from '@hono/node-server';
+import { serve } from '@hono/node-server'
+import { Hono } from 'hono'
+import { cors } from 'hono/cors'
+import { jwt } from 'hono/jwt'
 import 'dotenv/config';
 import "reflect-metadata";
 import { OpenAPIHono } from "@hono/zod-openapi";
@@ -13,6 +16,9 @@ import oferta from './routes/ofertaRoutes';
 import { setupDataSource } from './db/connection';
 import { authMiddleware } from './middelware/authMiddleware.ts';
 import adminRoutes from './routes/adminRoutes';
+
+
+
 
 
 
@@ -44,13 +50,31 @@ export async function createApp(): Promise<OpenAPIHono> {
 (async () => {
   dataSource = await setupDataSource();
   await dataSource.initialize();
+  const app = new Hono()
 
-  const app = await createApp();
+  app.use(
+    '/api/*',
+    cors({
+      origin: '*',
+      allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
+      credentials: true,
+    })
+  )
+
+  app.use(
+    '/api/admin/*',
+    jwt({
+      secret: process.env.JWT_SECRET!!,
+      cookie: 'jwt',
+    })
+  )
+
+  //const app = await createApp();
 
   app.use('/api/*', authMiddleware);
   app.route('/api/cliente', cliente);
   app.route('/', cliente);
-  app.route('/api/admin/', adminRoutes);
+  app.route('/api/admin', adminRoutes);
   app.route('/api/admin/tipo', tipoAdmin);
   app.route('/api/cliente/mascota', mascota);
   app.route('/api/cliente/tipo', tipoCliente);
