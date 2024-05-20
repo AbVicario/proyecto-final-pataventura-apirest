@@ -8,12 +8,12 @@ app.post('/', async (c) => {
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
 
-app.delete('/:tipo', async (c) => {
+app.delete('/:id_oferta', async (c) => {
     const result = await eliminarOferta(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
 
-app.put('/:tipo', async (c) => {
+app.put('/:id_oferta', async (c) => {
     const result = await modificarOferta(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 

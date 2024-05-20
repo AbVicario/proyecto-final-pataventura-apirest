@@ -58,8 +58,11 @@ export const eliminarMascota = async (c: any): Promise<Answer> => {
 
 export const guardarMascota = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
+    console.log("guardar mascota")
     const id = payload.id_usuario
+    console.log(id)
     const body = await c.req.json()
+    console.log(body)
     const queryRunner = await queryRunnerCreate()
 
     try {
@@ -127,6 +130,7 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
             mascota.color = body.color;
             mascota.tipo = body.tipo;
             mascota.observacion = body.observacion;
+            mascota.sexo = body.sexo;
 
             const mascotaActualizada = await mascota.save();
 
@@ -190,10 +194,35 @@ export const mostrarMascotas = async (c: any): Promise<Answer> => {
     try {
 
         const mascotas = await Mascota.findBy({ tutor: { id_usuario: id } })
+        console.log("lista mascotas")
         console.log(mascotas)
-        if (mascotas) {
+
+        // Convertir cada campo `imagen` de Buffer a array de bytes
+        const mascotasData = mascotas.map(mascota => {
+            const imagenArray = mascota.imagen ? Array.from(mascota.imagen) : null;
+            console.log('array ' + imagenArray)
             return {
-                data: mascotas,
+                id_mascota: mascota.id_mascota,
+                nombre: mascota.nombre,
+                num_chip: mascota.num_chip,
+                edad: mascota.edad,
+                imagen: imagenArray,
+                tamanyo: mascota.tamanyo,
+                peso: mascota.peso,
+                tipo: mascota.tipo,
+                raza: mascota.raza,
+                color: mascota.color,
+                observacion: mascota.observacion,
+                sexo: mascota.sexo,
+                tutor: mascota.tutor, // Asegúrate de que tutor también esté correctamente serializado si es necesario
+                demandas: mascota.demandas // Asegúrate de que demandas también esté correctamente serializado si es necesario
+            };
+        });
+
+        console.log('transformacion' + mascotasData)
+        if (mascotasData) {
+            return {
+                data: mascotasData,
                 status: 200,
                 ok: true,
             }

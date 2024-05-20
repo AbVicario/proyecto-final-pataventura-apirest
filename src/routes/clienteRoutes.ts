@@ -35,7 +35,6 @@ app.get('/cuidador', async (c) => {
 })
 
 app.get('/tutor', async (c) => {
-    console.log("ENTRA")
     const result = await getTutor(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })

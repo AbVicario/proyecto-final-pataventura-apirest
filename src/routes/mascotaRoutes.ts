@@ -6,7 +6,6 @@ const app = new Hono()
 
 
 app.post('/', async (c) => {
-    console.log("entra")
     const result = await guardarMascota(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })

@@ -21,11 +21,11 @@ export class Mascota extends BaseEntity {
     @Column({ nullable: true })
     edad: string
 
-    @Column({ nullable: true })
-    imagen: string
+    @Column({ type: 'bytea', nullable: true })
+    imagen: Buffer
 
-    @Column('numeric', { nullable: true })
-    tamanyo: number
+    @Column({ nullable: true })
+    tamanyo: string
 
     @Column('numeric', { nullable: true })
     peso: number
@@ -43,6 +43,9 @@ export class Mascota extends BaseEntity {
 
     @Column({ nullable: true })
     observacion: string
+
+    @Column({ nullable: true })
+    sexo: string
 
     @ManyToOne(() => Tutor, tutor => tutor.mascotas)
     tutor: Tutor;
