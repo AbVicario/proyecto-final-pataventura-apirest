@@ -9,10 +9,18 @@ export async function crearTutor(body: any, queryRunner: QueryRunner): Promise<T
     tutor.telefono = body.telefono;
     tutor.nombre = body.nombre;
     tutor.apellido = body.apellido;
-    tutor.imagen = body.imagen || "";
+    if (body.imagen && Array.isArray(body.imagen)) {
+        try {
+            tutor.imagen = Buffer.from(body.imagen);
+        } catch (error) {
+            console.error("Error al convertir los datos de la imagen a Buffer:", error);
+            tutor.imagen = null;
+        }
+    } else {
+        tutor.imagen = null;
+    }
     tutor.alias = body.alias;
     tutor.direccion = body.direccion
     tutor.mascotas = [];
-    console.log("ENtrraaahahha")
     return await queryRunner.manager.save(tutor);
 }

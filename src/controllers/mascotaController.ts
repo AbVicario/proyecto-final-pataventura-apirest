@@ -7,11 +7,12 @@ import { Tutor } from "../entity/Tutor";
 import { Answer } from "../models/answer";
 
 export const eliminarMascota = async (c: any): Promise<Answer> => {
-
     const id = c.req.param('id_mascota')
+    console.log('id mascota')
     const queryRunner = await queryRunnerCreate()
     try {
         const mascota = await Mascota.findOneBy({ id_mascota: id })
+        console.log(mascota)
         if (!mascota) {
             return {
                 data: "No existe esa mascota",
@@ -19,13 +20,16 @@ export const eliminarMascota = async (c: any): Promise<Answer> => {
                 ok: false,
             }
         } else {
-            for (const demanda of mascota.demandas) {
-                if (demanda.estado.toLowerCase() == "aceptada"
-                    || demanda.estado.toLowerCase() == "pendiente") {
-                    demanda.estado = "cancelada_por_tutor"
-                    await queryRunner.manager.save(demanda)
+            if (mascota.demandas) {
+                for (const demanda of mascota.demandas) {
+                    if (demanda.estado.toLowerCase() == "aceptada"
+                        || demanda.estado.toLowerCase() == "pendiente") {
+                        demanda.estado = "cancelada_por_tutor"
+                        await queryRunner.manager.save(demanda)
+                    }
                 }
             }
+
             const eliminada = await queryRunner.manager.remove(mascota)
             await queryRunner.commitTransaction()
             if (eliminada) {
@@ -67,7 +71,6 @@ export const guardarMascota = async (c: any): Promise<Answer> => {
 
     try {
         const tutor = await Tutor.findOneBy({ id_usuario: id })
-        console.log("tutor:" + tutor)
 
         if (!tutor) {
             return {
@@ -79,8 +82,6 @@ export const guardarMascota = async (c: any): Promise<Answer> => {
             const mascota = await crearMascota(body, tutor, queryRunner);
             await queryRunner.commitTransaction()
 
-            console.log(mascota);
-
             if (!mascota) {
                 return {
                     data: 'Error al crear mascota',
@@ -89,7 +90,7 @@ export const guardarMascota = async (c: any): Promise<Answer> => {
                 }
             } else {
                 return {
-                    data: 'Mascota creada',
+                    data: mascota.id_mascota,
                     status: 201,
                     ok: true,
                 }
@@ -124,7 +125,16 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
 
             mascota.nombre = body.nombre;
             mascota.edad = body.edad;
-            mascota.imagen = body.imagen;
+            if (body.imagen && Array.isArray(body.imagen)) {
+                try {
+                    mascota.imagen = Buffer.from(body.imagen);
+                } catch (error) {
+                    console.error("Error al convertir los datos de la imagen a Buffer:", error);
+                    mascota.imagen = null;
+                }
+            } else {
+                mascota.imagen = null;
+            }
             mascota.tamanyo = body.tamanyo;
             mascota.peso = body.peso;
             mascota.color = body.color;
@@ -164,9 +174,27 @@ export const mostrarMascota = async (c: any): Promise<Answer> => {
 
     try {
         const mascota = await Mascota.findOneBy({ id_mascota: id });
+
         if (mascota) {
+            const mascotaData = {
+                id_mascota: mascota.id_mascota,
+                nombre: mascota.nombre,
+                num_chip: mascota.num_chip,
+                edad: mascota.edad,
+                imagen: mascota.imagen ? Array.from(mascota.imagen) : null,
+                tamanyo: mascota.tamanyo,
+                peso: mascota.peso,
+                tipo: mascota.tipo,
+                raza: mascota.raza,
+                color: mascota.color,
+                observacion: mascota.observacion,
+                sexo: mascota.sexo,
+                tutor: mascota.tutor,
+                demandas: mascota.demandas
+            };
+
             return {
-                data: mascota,
+                data: mascotaData,
                 status: 200,
                 ok: true,
             }
@@ -194,13 +222,10 @@ export const mostrarMascotas = async (c: any): Promise<Answer> => {
     try {
 
         const mascotas = await Mascota.findBy({ tutor: { id_usuario: id } })
-        console.log("lista mascotas")
-        console.log(mascotas)
 
         // Convertir cada campo `imagen` de Buffer a array de bytes
         const mascotasData = mascotas.map(mascota => {
             const imagenArray = mascota.imagen ? Array.from(mascota.imagen) : null;
-            console.log('array ' + imagenArray)
             return {
                 id_mascota: mascota.id_mascota,
                 nombre: mascota.nombre,
@@ -214,12 +239,11 @@ export const mostrarMascotas = async (c: any): Promise<Answer> => {
                 color: mascota.color,
                 observacion: mascota.observacion,
                 sexo: mascota.sexo,
-                tutor: mascota.tutor, // Asegúrate de que tutor también esté correctamente serializado si es necesario
-                demandas: mascota.demandas // Asegúrate de que demandas también esté correctamente serializado si es necesario
+                tutor: mascota.tutor,
+                demandas: mascota.demandas
             };
         });
 
-        console.log('transformacion' + mascotasData)
         if (mascotasData) {
             return {
                 data: mascotasData,

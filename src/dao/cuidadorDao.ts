@@ -9,7 +9,16 @@ export async function crearCuidador(body: any, queryRunner: QueryRunner): Promis
     cuidador.telefono = body.telefono;
     cuidador.nombre = body.nombre;
     cuidador.apellido = body.apellido;
-    cuidador.imagen = body.imagen || "";
+    if (body.imagen && Array.isArray(body.imagen)) {
+        try {
+            cuidador.imagen = Buffer.from(body.imagen);
+        } catch (error) {
+            console.error("Error al convertir los datos de la imagen a Buffer:", error);
+            cuidador.imagen = null;
+        }
+    } else {
+        cuidador.imagen = null;
+    }
     cuidador.alias = body.alias;
     cuidador.ofertas = [];
     cuidador.demandas = [];

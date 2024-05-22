@@ -18,8 +18,8 @@ export abstract class Cliente extends Usuario {
     @IsNotEmpty({ message: 'El apellido no puede estar en blanco' })
     apellido: string
 
-    @Column({ nullable: true })
-    imagen: string
+    @Column({ type: 'bytea', nullable: true })
+    imagen: Buffer
 
     @Column({ unique: true })
     @IsNotEmpty({ message: 'El alias no puede estar en blanco' })

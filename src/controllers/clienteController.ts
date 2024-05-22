@@ -60,7 +60,6 @@ export const loginTutor = async (c: any): Promise<Answer> => {
     const tutor = await Tutor.findOneBy({
         email: body.email
     })
-    console.log(tutor)
     if (!tutor) {
         return {
             data: 'Email no encontrado',
@@ -112,8 +111,6 @@ export const registroTutor = async (c: any): Promise<Answer> => {
         //const mascota = await crearMascota(body, tutor, queryRunner);
 
         //if (mascota) tutor.mascotas.push(mascota);
-        await queryRunner.manager.save(tutor);
-
         await queryRunner.commitTransaction()
         return { data: tutor.id_usuario, status: 200, ok: true };
 
@@ -135,7 +132,19 @@ export const getCuidador = async (c: any): Promise<Answer> => {
 
         const cuidador = await Cuidador.findOneBy({ id_usuario: id_cuidador });
 
-        return { data: cuidador, status: 200, ok: true };
+        const cuidadorData = {
+            idUsuario: cuidador.id_usuario,
+            email: cuidador.email,
+            password: cuidador.password,
+            telefono: cuidador.telefono,
+            nombre: cuidador.nombre,
+            apellido: cuidador.apellido,
+            imagen: cuidador.imagen ? Array.from(cuidador.imagen) : null,
+            alias: cuidador.alias,
+            direccion: cuidador.direccion
+        }
+
+        return { data: cuidadorData, status: 200, ok: true };
     } catch (error) {
         console.error("Error:", error);
         return { data: error.message, status: 500, ok: false };
@@ -151,9 +160,20 @@ export const getTutor = async (c: any): Promise<Answer> => {
         console.log("pinta", id_tutor)
 
         const tutor = await Tutor.findOneBy({ id_usuario: id_tutor });
-        console.log("Tutor:", tutor);
 
-        return { data: tutor, status: 200, ok: true };
+        const tutorData = {
+            idUsuario: tutor.id_usuario,
+            email: tutor.email,
+            password: tutor.password,
+            telefono: tutor.telefono,
+            nombre: tutor.nombre,
+            apellido: tutor.apellido,
+            imagen: tutor.imagen ? Array.from(tutor.imagen) : null,
+            alias: tutor.alias,
+            direccion: tutor.direccion
+        }
+
+        return { data: tutorData, status: 200, ok: true };
     } catch (error) {
         console.error("Error:", error);
         return { data: error.message, status: 500, ok: false };
@@ -188,7 +208,22 @@ export const mostrarCuidadores = async (c: any): Promise<Answer> => {
     try {
         const cuidadores = await Cuidador.createQueryBuilder("cuidador").innerJoin("cuidador.ofertas", "oferta").where("oferta.tipo = :tipo", { tipo }).getMany()
 
-        if (cuidadores.length <= 0) {
+        //Acordarse de transformar las imagenes a byteArray(como en getMascotas)
+        const cuidadoresData = cuidadores.map(cuidador => {
+            const imagenArray = cuidador.imagen ? Array.from(cuidador.imagen) : null;
+            return {
+                idUsuario: cuidador.id_usuario,
+                email: cuidador.email,
+                password: cuidador.password,
+                telefono: cuidador.telefono,
+                nombre: cuidador.nombre,
+                apellido: cuidador.apellido,
+                imagen: imagenArray,
+                alias: cuidador.alias,
+                direccion: cuidador.direccion
+            };
+        });
+        if (cuidadoresData.length <= 0) {
             return {
                 data: "No se encuentran cuidadores del tipo: " + tipo,
                 status: 404,
@@ -196,7 +231,7 @@ export const mostrarCuidadores = async (c: any): Promise<Answer> => {
             }
         } else {
             return {
-                data: cuidadores,
+                data: cuidadoresData,
                 status: 200,
                 ok: true
             }
@@ -208,11 +243,13 @@ export const mostrarCuidadores = async (c: any): Promise<Answer> => {
 
 export const updateTutor = async (c: any): Promise<Answer> => {
     try {
+        console.log('entra en update tutor')
         const body = await c.req.json();
         const id = c.req.param('id_tutor')
         const tutor = await Tutor.findOneBy({ id_usuario: id });
 
         if (!tutor) {
+            console.log('tutor no existe')
             return {
                 data: "El tutor no existe",
                 status: 404,
@@ -224,14 +261,36 @@ export const updateTutor = async (c: any): Promise<Answer> => {
             tutor.telefono = body.telefono;
             tutor.email = body.email;
             tutor.direccion = body.direccion;
+            if (body.imagen && Array.isArray(body.imagen)) {
+                try {
+                    tutor.imagen = Buffer.from(body.imagen);
+                } catch (error) {
+                    console.error("Error al convertir los datos de la imagen a Buffer:", error);
+                    tutor.imagen = null;
+                }
+            } else {
+                tutor.imagen = null;
+            }
 
             const tutorActualizado = await tutor.save();
-
             console.log(tutorActualizado)
 
             if (tutorActualizado) {
+                const tutorData = {
+                    idUsuario: tutorActualizado.id_usuario,
+                    email: tutorActualizado.email,
+                    password: tutorActualizado.password,
+                    telefono: tutorActualizado.telefono,
+                    nombre: tutorActualizado.nombre,
+                    apellido: tutorActualizado.apellido,
+                    imagen: tutorActualizado.imagen ? Array.from(tutorActualizado.imagen) : null,
+                    alias: tutorActualizado.alias,
+                    direccion: tutorActualizado.direccion
+                }
+                console.log("TutorData = " + tutorData.idUsuario)
+
                 return {
-                    data: tutorActualizado,
+                    data: tutorData,
                     status: 200,
                     ok: true,
                 };
@@ -262,7 +321,7 @@ export const updateCuidador = async (c: any): Promise<Answer> => {
 
         if (!cuidador) {
             return {
-                data: "El tutor no existe",
+                data: "El cuidador no existe",
                 status: 404,
                 ok: false,
             };
@@ -272,17 +331,39 @@ export const updateCuidador = async (c: any): Promise<Answer> => {
             cuidador.telefono = body.telefono;
             cuidador.email = body.email;
             cuidador.direccion = body.direccion;
+            if (body.imagen && Array.isArray(body.imagen)) {
+                try {
+                    cuidador.imagen = Buffer.from(body.imagen);
+                } catch (error) {
+                    cuidador.imagen = null;
+                }
+            } else {
+                cuidador.imagen = null;
+            }
+
             const cuidadorActualizado = await cuidador.save();
 
             if (cuidadorActualizado) {
+                const cuidadorData = {
+                    idUsuario: cuidadorActualizado.id_usuario,
+                    email: cuidadorActualizado.email,
+                    password: cuidadorActualizado.password,
+                    telefono: cuidadorActualizado.telefono,
+                    nombre: cuidadorActualizado.nombre,
+                    apellido: cuidadorActualizado.apellido,
+                    imagen: cuidadorActualizado.imagen ? Array.from(cuidadorActualizado.imagen) : null,
+                    alias: cuidadorActualizado.alias,
+                    direccion: cuidadorActualizado.direccion
+                }
+
                 return {
-                    data: cuidadorActualizado,
+                    data: cuidadorData,
                     status: 200,
                     ok: true,
                 };
             } else {
                 return {
-                    data: "El tutor no se puede actualizar",
+                    data: "El cuidador no se puede actualizar",
                     status: 404,
                     ok: false,
                 };
