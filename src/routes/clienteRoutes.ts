@@ -1,5 +1,8 @@
 import { Hono } from "hono"
-import { registroCuidador, registroTutor, loginCuidador, loginTutor, mostrarCuidadores, updateTutor, updateCuidador, getCuidador, getTutor } from "../controllers/clienteController"
+import {
+    registroCuidador, registroTutor, loginCuidador, loginTutor, mostrarCuidadores,
+    updateTutor, updateCuidador, getCuidador, getTutor, getCuidadorByDistance
+} from "../controllers/clienteController"
 import { log } from "console"
 
 const app = new Hono()
@@ -48,5 +51,12 @@ app.put('/updateCuidador/:id_cuidador', async (c) => {
     const result = await updateCuidador(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
-//falta put
+
+
+
+app.get('/cuidadorByDistance', async (c) => {
+    const result = await getCuidadorByDistance(c)
+    return c.json({ data: result.data, ok: result.ok, status: result.status })
+})
+
 export default app

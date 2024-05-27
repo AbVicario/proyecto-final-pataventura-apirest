@@ -7,6 +7,9 @@ import { Tutor } from "../entity/Tutor"
 import { crearTutor } from "../dao/tutorDao"
 import { crearCuidador } from "../dao/cuidadorDao"
 import { queryRunnerCreate } from "../db/queryRunner"
+import { Ubicacion } from "../entity/Ubicacion"
+import { Oferta } from "../entity/Oferta"
+import { getRepository } from "typeorm"
 
 export const loginCuidador = async (c: any): Promise<Answer> => {
 
@@ -133,7 +136,7 @@ export const getCuidador = async (c: any): Promise<Answer> => {
         const cuidador = await Cuidador.findOneBy({ id_usuario: id_cuidador });
 
         const cuidadorData = {
-            idUsuario: cuidador.id_usuario,
+            id_usuario: cuidador.id_usuario,
             email: cuidador.email,
             password: cuidador.password,
             telefono: cuidador.telefono,
@@ -162,7 +165,7 @@ export const getTutor = async (c: any): Promise<Answer> => {
         const tutor = await Tutor.findOneBy({ id_usuario: id_tutor });
 
         const tutorData = {
-            idUsuario: tutor.id_usuario,
+            id_usuario: id_tutor,
             email: tutor.email,
             password: tutor.password,
             telefono: tutor.telefono,
@@ -172,6 +175,7 @@ export const getTutor = async (c: any): Promise<Answer> => {
             alias: tutor.alias,
             direccion: tutor.direccion
         }
+        console.log("tutorData: " + tutorData.id_usuario)
 
         return { data: tutorData, status: 200, ok: true };
     } catch (error) {
@@ -187,16 +191,12 @@ export const registroCuidador = async (c: any): Promise<Answer> => {
         const body = await c.req.json();
         console.log(body)
         const cuidador = await crearCuidador(body, queryRunner);
-
-        //await crearUbicacionCuidador(body, cuidador, queryRunner);
-
-        //const oferta = await crearOferta(body, cuidador, queryRunner);
-        //if (oferta) cuidador.ofertas.push(oferta)
         await queryRunner.commitTransaction()
         return { data: cuidador.id_usuario, status: 200, ok: true };
 
     } catch (error) {
         await queryRunner.rollbackTransaction()
+        console.log(error.message)
         return { data: error.message, status: 500, ok: false };
     } finally {
         await queryRunner.release()
@@ -212,7 +212,7 @@ export const mostrarCuidadores = async (c: any): Promise<Answer> => {
         const cuidadoresData = cuidadores.map(cuidador => {
             const imagenArray = cuidador.imagen ? Array.from(cuidador.imagen) : null;
             return {
-                idUsuario: cuidador.id_usuario,
+                id_usuario: cuidador.id_usuario,
                 email: cuidador.email,
                 password: cuidador.password,
                 telefono: cuidador.telefono,
@@ -277,7 +277,7 @@ export const updateTutor = async (c: any): Promise<Answer> => {
 
             if (tutorActualizado) {
                 const tutorData = {
-                    idUsuario: tutorActualizado.id_usuario,
+                    id_usuario: tutorActualizado.id_usuario,
                     email: tutorActualizado.email,
                     password: tutorActualizado.password,
                     telefono: tutorActualizado.telefono,
@@ -287,7 +287,7 @@ export const updateTutor = async (c: any): Promise<Answer> => {
                     alias: tutorActualizado.alias,
                     direccion: tutorActualizado.direccion
                 }
-                console.log("TutorData = " + tutorData.idUsuario)
+                console.log("TutorData = " + tutorData.id_usuario)
 
                 return {
                     data: tutorData,
@@ -345,7 +345,7 @@ export const updateCuidador = async (c: any): Promise<Answer> => {
 
             if (cuidadorActualizado) {
                 const cuidadorData = {
-                    idUsuario: cuidadorActualizado.id_usuario,
+                    id_usuario: cuidadorActualizado.id_usuario,
                     email: cuidadorActualizado.email,
                     password: cuidadorActualizado.password,
                     telefono: cuidadorActualizado.telefono,
@@ -381,3 +381,81 @@ export const updateCuidador = async (c: any): Promise<Answer> => {
 }
 
 
+export const getCuidadorByDistance = async (c: any): Promise<Answer> => {
+    try {
+        const payload = await c.get('jwtPayload');
+
+
+        const id_tutor = payload.id_usuario;
+        const ubicacionTutor = await Ubicacion.findOneBy({ tutor: { id_usuario: id_tutor } })
+        const coordenadaTutor = JSON.parse(JSON.stringify(ubicacionTutor.coordenadas))
+        const cuidadores = await Cuidador.createQueryBuilder("cuidador").leftJoinAndSelect("cuidador.ofertas", "oferta").getMany()
+
+
+        let cuidadoresByDistance = []
+        for (const cuidador of cuidadores) {
+            const ubicacionCuidador = await Ubicacion.findOneBy({ cuidador: { id_usuario: cuidador.id_usuario } })
+            const coordenadaCuidador = JSON.parse(JSON.stringify(ubicacionCuidador.coordenadas))
+            const distancia = calculateDistance(coordenadaTutor.x, coordenadaTutor.y, coordenadaCuidador.x, coordenadaCuidador.y)
+            for (const oferta of cuidador.ofertas) {
+                if (distancia <= oferta.radio) {
+                    const cuidadorData = {
+                        id_usuario: cuidador.id_usuario,
+                        email: cuidador.email,
+                        password: cuidador.password,
+                        telefono: cuidador.telefono,
+                        nombre: cuidador.nombre,
+                        apellido: cuidador.apellido,
+                        imagen: cuidador.imagen ? Array.from(cuidador.imagen) : null,
+                        alias: cuidador.alias,
+                        direccion: cuidador.direccion,
+                        ubicacion: JSON.stringify(ubicacionCuidador.coordenadas),
+                        oferta: oferta
+                    }
+                    console.log(cuidadorData)
+                    cuidadoresByDistance.push(cuidadorData)
+                }
+            }
+        }
+
+        if (cuidadoresByDistance) {
+            return {
+                data: cuidadoresByDistance,
+                status: 200,
+                ok: true,
+            }
+        } else {
+            return {
+                data: "No existen cuidadores con los datos proporcionados",
+                status: 404,
+                ok: false,
+            }
+        }
+
+
+    } catch (error) {
+        console.log('error:', error);
+        return {
+            data: error.message,
+            status: 500,
+            ok: false,
+        };
+    }
+}
+
+
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    console.log(lat1, lon1, lat2, lon2)
+    const earthRadius = 6371.0; // Kilometers
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return earthRadius * c * 1000;
+}
+
+function toRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
+}

@@ -14,9 +14,8 @@ app.delete('/:id_valoracion', async (c) => {
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
 
-app.get('/:id_demanda', async (c) => {
-    const id = parseInt(c.req.param('id_demanda'))
-    const result = await mostrarValoraciones(id)
+app.get('/:id_cuidador', async (c) => {
+    const result = await mostrarValoraciones(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
 

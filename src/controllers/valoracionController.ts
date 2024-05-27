@@ -4,44 +4,89 @@ import { Valoracion } from "../entity/Valoracion";
 import { Answer } from "../models/answer";
 import { Demanda } from "../entity/Demanda";
 import { crearValoracion } from "../dao/valoracionDao";
-import { Cuidador } from "../entity/Cuidador";
 
 export const guardarValoracion = async (c: any): Promise<Answer> => {
+    const payload = await c.get('jwtPayload')
+    const id_tutor = payload.id_usuario
 
     const body = await c.req.json()
     const id_demanda = body.id_demanda
     const queryRunner = await queryRunnerCreate()
+
     try {
-        const demanda = await Demanda.findOneBy({ id_demanda: id_demanda })
-        if (demanda.estado === "Cancelada por cuidador" || demanda.estado === "Realizada") {
-            const valoracion = await crearValoracion(body, demanda, queryRunner)
-            if (valoracion) {
-                return {
-                    data: "Valoración creada con exito",
-                    status: 200,
-                    ok: true
+        const demanda = await Demanda.createQueryBuilder("demanda")
+            .innerJoinAndSelect("demanda.mascota", "mascota")
+            .innerJoinAndSelect("mascota.tutor", "tutor")
+            .where("demanda.id_demanda = :id_demanda", { id_demanda: id_demanda })
+            .getOne()
+
+        //Este codigo debería realizarse automaticamente con un job
+        if (demanda.fechaFin < new Date() && demanda.estado === "Pendiente") {
+            demanda.estado = "Realizada"
+            await demanda.save()
+        }
+
+        if (demanda.mascota.tutor.id_usuario == id_tutor) {
+            if (demanda.estado === "Cancelada por cuidador" || demanda.estado === "Realizada") {
+                const existeValoracion = await Valoracion.findOne({
+                    where: {
+                        demanda: {
+                            id_demanda: demanda.id_demanda
+                        }
+                    },
+                    relations: ["demanda"]
+                });
+
+                if (!existeValoracion) {
+                    const valoracion = await crearValoracion(body, demanda, queryRunner)
+                    await queryRunner.commitTransaction()
+                    if (valoracion) {
+                        return {
+                            data: "Valoración creada con exito",
+                            status: 200,
+                            ok: true
+                        }
+                    } else {
+                        return {
+                            data: "Valoración no se pudo crear",
+                            status: 404,
+                            ok: false
+                        }
+                    }
+                } else {
+                    return {
+                        data: "Ya existe una valoración para esa demanda",
+                        status: 404,
+                        ok: false
+                    }
                 }
+
             } else {
                 return {
-                    data: "Valoración no se pudo crear",
+                    data: " El estado de la demanda no permite valoración",
                     status: 404,
                     ok: false
                 }
             }
         } else {
             return {
-                data: " El estado de la demanda no permite valoración",
-                status: 404,
-                ok: false
+                data: "El tutor no corresponde con la demanda que quiere valorar",
+                status: 400,
+                ok: false,
             }
         }
+
     } catch (error) {
+        await queryRunner.rollbackTransaction()
         console.log('error:', error);
         return {
             data: error.message,
             status: 400,
             ok: false,
         }
+    }
+    finally {
+        await queryRunner.release()
     }
 }
 
@@ -81,13 +126,34 @@ export const eliminarValoracion = async (id_valoracion: number): Promise<Answer>
     }
 }
 
-export const mostrarValoraciones = async (id_demanda: number): Promise<Answer> => {
-    //revisar (sin acabar)
+export const mostrarValoraciones = async (c: any): Promise<Answer> => {
+
+    const id = c.req.param('id_cuidador')
     try {
-        const valoraciones = await Valoracion.findBy({ demanda: { id_demanda: id_demanda } })
+        const valoraciones = await Valoracion.createQueryBuilder("valoracion")
+            .innerJoinAndSelect("valoracion.demanda", "demanda")
+            .innerJoinAndSelect("demanda.oferta", "oferta")
+            .innerJoinAndSelect("oferta.cuidador", "cuidador")
+            .innerJoinAndSelect("demanda.mascota", "mascota")
+            .innerJoinAndSelect("mascota.tutor", "tutor")
+            .where("cuidador.id_usuario = :id_usuario", { id_usuario: id })
+            .orderBy("valoracion.id_valoracion", "DESC")
+            .getMany()
+
+        console.log(valoraciones)
         if (valoraciones) {
+            const valoracionesData = valoraciones.map(valoracion => {
+                const imagenTutorArray = valoracion.demanda.mascota.tutor.imagen ? Array.from(valoracion.demanda.mascota.tutor.imagen) : null;
+                return {
+                    id_valoracion: valoracion.id_valoracion,
+                    puntuacion: valoracion.puntuacion,
+                    descripcion: valoracion.descripcion,
+                    alias_tutor: valoracion.demanda.mascota.tutor.alias,
+                    imagen_tutor: imagenTutorArray
+                };
+            });
             return {
-                data: valoraciones,
+                data: valoracionesData,
                 status: 200,
                 ok: true,
             }

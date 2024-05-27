@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsNumber } from "class-validator";
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Cuidador } from "./Cuidador";
+import { Demanda } from "./Demanda";
 
 @Entity()
 export class Oferta extends BaseEntity {
@@ -25,5 +26,8 @@ export class Oferta extends BaseEntity {
 
     @ManyToOne(() => Cuidador, cuidador => cuidador.ofertas, { nullable: true })
     cuidador: Cuidador;
+
+    @OneToMany(() => Demanda, demanda => demanda.oferta, { nullable: true })
+    demandas: Demanda[];
 }
 

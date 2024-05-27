@@ -2,10 +2,11 @@ import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "t
 import { Cuidador } from "./Cuidador";
 import { Mascota } from "./Mascota";
 import { IsDate, IsNotEmpty, IsNumber } from "class-validator";
+import { Oferta } from "./Oferta";
 
 
 @Entity()
-export class Demanda extends BaseEntity{
+export class Demanda extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id_demanda: number
@@ -18,20 +19,16 @@ export class Demanda extends BaseEntity{
     @IsDate({ message: "La fecha de fin debe tener un formato válido" })
     fechaFin: Date
 
-    @Column('numeric')
-    @IsNumber({},{message: "Debe incluir un precio valido"})
-    precio: number
-
     @Column()
-    @IsNotEmpty({message: "La descripción no puede ser un campo vacio"})
+    @IsNotEmpty({ message: "La descripción no puede ser un campo vacio" })
     descripcion: string
 
     @Column()
-    @IsNotEmpty({message: "El estado no puede ser un campo vacio"})
+    @IsNotEmpty({ message: "El estado no puede ser un campo vacio" })
     estado: string
 
-    @ManyToOne(() => Cuidador, cuidador => cuidador.demandas, {nullable: true} )
-    cuidador: Cuidador;
+    @ManyToOne(() => Oferta, oferta => oferta.demandas, { nullable: true })
+    oferta: Oferta;
 
     @ManyToOne(() => Mascota, mascota => mascota.demandas)
     mascota: Mascota;

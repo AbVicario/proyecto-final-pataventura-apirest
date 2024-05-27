@@ -1,7 +1,6 @@
 
 import { Hono } from "hono"
-import { loginAdmin } from "../controllers/adminController.ts"
-import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi"
+import { loginAdmin } from "../controllers/adminController"
 
 const app = new Hono()
 app.post('/loginAdmin', async (c) => {

@@ -1,9 +1,9 @@
 import { crearDemanda } from "../dao/demandaDao";
+import { crearNotificacion } from "../dao/notificacionDao";
 import { queryRunnerCreate } from "../db/queryRunner";
-import { Cuidador } from "../entity/Cuidador";
 import { Demanda } from "../entity/Demanda";
 import { Mascota } from "../entity/Mascota";
-import { Tutor } from "../entity/Tutor";
+import { Oferta } from "../entity/Oferta";
 import { Answer } from "../models/answer";
 
 export const eliminarDemanda = async (c: any): Promise<Answer> => {
@@ -57,53 +57,42 @@ export const eliminarDemanda = async (c: any): Promise<Answer> => {
 }
 
 export const solicitarDemanda = async (c: any): Promise<Answer> => {
-    const payload = await c.get('jwtPayload')
-    const id = payload.id_usuario
     const body = await c.req.json()
-    const id_cuidador = body.id_cuidador
+    const id_mascota = body.id_mascota
+    const id_oferta = body.id_oferta
     const queryRunner = await queryRunnerCreate()
 
     try {
-        const tutor = await Tutor.findOneBy({ id_usuario: id })
-        await queryRunner.commitTransaction()
-        if (!tutor) {
+        const mascota = await Mascota.findOneBy({ id_mascota: id_mascota })
+        const oferta = await Oferta.findOneBy({ id_oferta: id_oferta })
+
+        if (!mascota) {
             return {
-                data: 'No existe el tutor',
+                data: 'Error, la mascota no existe',
+                status: 404,
+                ok: false,
+            }
+        } else if (!oferta) {
+            return {
+                data: 'Error, la oferta no existe',
                 status: 404,
                 ok: false,
             }
         } else {
-            const mascota = await Mascota.findOneBy({ tutor: { id_usuario: id } })
-
-            if (!mascota) {
+            const demanda = await crearDemanda(body, mascota, oferta, queryRunner)
+            await crearNotificacion("Tienes una nueva solicitud.", demanda, queryRunner)
+            await queryRunner.commitTransaction()
+            if (demanda) {
                 return {
-                    data: 'El tutor no tiene mascota',
-                    status: 404,
-                    ok: false,
+                    data: 'Demanda creada con exito',
+                    status: 200,
+                    ok: true,
                 }
             } else {
-                const cuidador = await Cuidador.findOneBy({ id_usuario: id_cuidador })
-                if (!cuidador) {
-                    return {
-                        data: 'El cuidador no existe',
-                        status: 404,
-                        ok: false,
-                    }
-                } else {
-                    const demanda = crearDemanda(body, mascota, cuidador, queryRunner)
-                    if (!demanda) {
-                        return {
-                            data: 'Demanda creada con exito',
-                            status: 200,
-                            ok: true,
-                        }
-                    } else {
-                        return {
-                            data: 'No se pudo crear la demanda',
-                            status: 404,
-                            ok: false,
-                        }
-                    }
+                return {
+                    data: 'No se pudo crear la demanda',
+                    status: 404,
+                    ok: false,
                 }
             }
         }
