@@ -8,6 +8,7 @@ export async function crearDemanda(body: any, mascota: Mascota, oferta: Oferta, 
     demanda.fechaInicio = body.fechaInicio
     demanda.fechaFin = body.fechaFin
     demanda.descripcion = body.descripcion
+    demanda.precio = body.precio
     demanda.estado = "Pendiente"
     demanda.oferta = oferta
     demanda.mascota = mascota;

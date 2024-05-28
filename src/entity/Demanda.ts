@@ -3,6 +3,7 @@ import { Cuidador } from "./Cuidador";
 import { Mascota } from "./Mascota";
 import { IsDate, IsNotEmpty, IsNumber } from "class-validator";
 import { Oferta } from "./Oferta";
+import { nullable } from "zod";
 
 
 @Entity()
@@ -22,6 +23,9 @@ export class Demanda extends BaseEntity {
     @Column()
     @IsNotEmpty({ message: "La descripción no puede ser un campo vacio" })
     descripcion: string
+
+    @Column({ nullable: true })
+    precio: number
 
     @Column()
     @IsNotEmpty({ message: "El estado no puede ser un campo vacio" })

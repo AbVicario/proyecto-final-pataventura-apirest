@@ -65,7 +65,6 @@ export const solicitarDemanda = async (c: any): Promise<Answer> => {
     try {
         const mascota = await Mascota.findOneBy({ id_mascota: id_mascota })
         const oferta = await Oferta.findOneBy({ id_oferta: id_oferta })
-
         if (!mascota) {
             return {
                 data: 'Error, la mascota no existe',
