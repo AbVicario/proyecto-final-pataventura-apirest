@@ -72,16 +72,17 @@ export const mostrarNotificaciones = async (c: any): Promise<Answer> => {
             console.log(notificaciones)
 
 
-            const notificacionesData = notificaciones.map(notficacion => {
+            const notificacionesData = notificaciones.map(notificacion => {
+                const fecha = new Date(notificacion.fechaCreacion)
                 return {
-                    id_alerta: notficacion.id_alerta,
-                    fechaCracion: notficacion.fechaCreacion,
-                    estado: notficacion.estado,
-                    descripcion: notficacion.descripcion,
-                    demanda: notficacion.demanda,
-                    tipo: notficacion.demanda.oferta.tipo,
-                    direccion: notficacion.demanda.mascota.tutor.direccion,
-                    destinatario: notficacion.destinatario
+                    id_alerta: notificacion.id_alerta,
+                    fechaCracion: fecha,
+                    estado: notificacion.estado,
+                    descripcion: notificacion.descripcion,
+                    demanda: notificacion.demanda,
+                    tipo: notificacion.demanda.oferta.tipo,
+                    direccion: notificacion.demanda.mascota.tutor.direccion,
+                    mascotaName: notificacion.demanda.mascota.nombre
                 };
             });
 
