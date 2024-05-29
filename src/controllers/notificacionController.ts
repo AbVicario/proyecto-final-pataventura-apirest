@@ -51,8 +51,7 @@ export const mostrarNotificaciones = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
     const id_usuario = payload.id_usuario
     const cliente = c.req.param('rol')
-    console.log(cliente)
-    console.log(id_usuario)
+
 
     try {
         let notificaciones = await Notificacion.createQueryBuilder("notificacion")
@@ -69,14 +68,11 @@ export const mostrarNotificaciones = async (c: any): Promise<Answer> => {
 
 
         if (notificaciones) {
-            console.log(notificaciones)
-
-
             const notificacionesData = notificaciones.map(notificacion => {
                 const fecha = new Date(notificacion.fechaCreacion)
                 return {
                     id_alerta : notificacion.id_alerta,
-                    fechaCracion : formatDate(fecha),
+                    fechaCreacion : formatDate(fecha),
                     estado : notificacion.estado,
                     descripcion : notificacion.descripcion,
                     demanda : notificacion.demanda,
