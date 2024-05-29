@@ -3,7 +3,7 @@ import { modificarNotificacion, mostrarNotificaciones } from "../controllers/not
 
 const app = new Hono()
 
-app.post('/:id_notificacion', async (c) => {
+app.put('/', async (c) => {
     const result = await modificarNotificacion(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })

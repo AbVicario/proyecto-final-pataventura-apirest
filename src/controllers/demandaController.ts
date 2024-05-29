@@ -109,10 +109,10 @@ export const solicitarDemanda = async (c: any): Promise<Answer> => {
 
 export const modificarDemanda = async (c: any): Promise<Answer> => {
     const body = await c.req.json();
-    const id = c.req.param('id_demanda')
+    const id = body.id_demanda
     const queryRunner = await queryRunnerCreate()
     try {
-        
+
         const demanda = await Demanda.findOneBy({ id_demanda: id });
 
         if (!demanda) {
@@ -122,7 +122,7 @@ export const modificarDemanda = async (c: any): Promise<Answer> => {
                 ok: false,
             };
         } else {
-            
+
             demanda.estado = body.estado
             const demandaActualizada = await demanda.save();
 
@@ -147,7 +147,7 @@ export const modificarDemanda = async (c: any): Promise<Answer> => {
                     break;
                 default:
                     descripcion = "Estado desconocido.";
-                    destinatario =  "desconocido";
+                    destinatario = "desconocido";
                     break;
             }
             await crearNotificacion(descripcion, destinatario, demanda, queryRunner)

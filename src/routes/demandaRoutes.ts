@@ -13,7 +13,7 @@ app.delete('/:id_demanda', async (c) => {
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
 
-app.put('/:id_demanda', async (c) => {
+app.put('/', async (c) => {
     const result = await modificarDemanda(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })

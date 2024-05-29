@@ -5,7 +5,7 @@ import { Answer } from "../models/answer";
 export const modificarNotificacion = async (c: any): Promise<Answer> => {
     try {
         const body = await c.req.json();
-        const id = c.req.param('id_alerta')
+        const id = body.id_alerta
 
         const notificacion = await Notificacion.findOneBy({ id_alerta: id });
 
@@ -52,7 +52,6 @@ export const mostrarNotificaciones = async (c: any): Promise<Answer> => {
     const id_usuario = payload.id_usuario
     const cliente = c.req.param('rol')
 
-
     try {
         let notificaciones = await Notificacion.createQueryBuilder("notificacion")
             .innerJoinAndSelect("notificacion.demanda", "demanda")
@@ -71,14 +70,14 @@ export const mostrarNotificaciones = async (c: any): Promise<Answer> => {
             const notificacionesData = notificaciones.map(notificacion => {
                 const fecha = new Date(notificacion.fechaCreacion)
                 return {
-                    id_alerta : notificacion.id_alerta,
-                    fechaCreacion : formatDate(fecha),
-                    estado : notificacion.estado,
-                    descripcion : notificacion.descripcion,
-                    demanda : notificacion.demanda,
-                    tipo : notificacion.demanda.oferta.tipo,
-                    direccion : notificacion.demanda.mascota.tutor.direccion,
-                    mascotaName : notificacion.demanda.mascota.nombre
+                    id_alerta: notificacion.id_alerta,
+                    fechaCreacion: formatDate(fecha),
+                    estado: notificacion.estado,
+                    descripcion: notificacion.descripcion,
+                    demanda: notificacion.demanda,
+                    tipo: notificacion.demanda.oferta.tipo,
+                    direccion: notificacion.demanda.mascota.tutor.direccion,
+                    mascotaName: notificacion.demanda.mascota.nombre
                 };
             });
 

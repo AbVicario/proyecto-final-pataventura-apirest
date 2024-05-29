@@ -8,11 +8,9 @@ import { Answer } from "../models/answer";
 
 export const eliminarMascota = async (c: any): Promise<Answer> => {
     const id = c.req.param('id_mascota')
-    console.log('id mascota')
     const queryRunner = await queryRunnerCreate()
     try {
         const mascota = await Mascota.findOneBy({ id_mascota: id })
-        console.log(mascota)
         if (!mascota) {
             return {
                 data: "No existe esa mascota",
@@ -62,11 +60,8 @@ export const eliminarMascota = async (c: any): Promise<Answer> => {
 
 export const guardarMascota = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
-    console.log("guardar mascota")
     const id = payload.id_usuario
-    console.log(id)
     const body = await c.req.json()
-    console.log(body)
     const queryRunner = await queryRunnerCreate()
 
     try {

@@ -9,17 +9,13 @@ export const guardarOferta = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
     const id_cuidador = payload.id_usuario
     const body = await c.req.json()
-    console.log(body)
     const queryRunner = await queryRunnerCreate()
     try {
         const cuidador = await Cuidador.findOneBy({ id_usuario: id_cuidador })
         const ofertas = await Oferta.findBy({ cuidador: { id_usuario: id_cuidador } })
-        console.log(ofertas)
         let existe = false
         for (const oferta of ofertas) {
-            console.log(oferta)
             if (oferta.tipo == body.tipo) {
-                console.log("entra")
                 existe = true
             }
         }
@@ -62,20 +58,14 @@ export const guardarOferta = async (c: any): Promise<Answer> => {
 
 export const eliminarOferta = async (c: any): Promise<Answer> => {
     const id = await c.get('jwtPayLoad')
-    console.log(await c.req.param('id_oferta'))
     const id_oferta: number = await c.req.param('id_oferta')
     var result: any
-    console.log(id_oferta)
 
     try {
         const ofertas = await Oferta.findBy({ cuidador: { id_usuario: id } })
-        console.log(ofertas)
 
         for (const oferta of ofertas) {
-
-            console.log(oferta)
             if (oferta.id_oferta == id_oferta) {
-                console.log("entra")
                 result = await Oferta.remove(oferta)
             }
         }
@@ -108,10 +98,6 @@ export const modificarOferta = async (c: any): Promise<Answer> => {
         const id = c.req.param('id_oferta')
         const oferta = await Oferta.findOneBy({ id_oferta: id });
 
-        console.log(body)
-
-        console.log(oferta)
-
         if (!oferta) {
             return {
                 data: "La oferta no existe",
@@ -123,7 +109,6 @@ export const modificarOferta = async (c: any): Promise<Answer> => {
             oferta.precio = body.precio
             oferta.radio = body.radio
             const ofertaActualizada = await oferta.save();
-            console.log(ofertaActualizada)
 
             if (ofertaActualizada) {
                 return {
@@ -152,13 +137,10 @@ export const modificarOferta = async (c: any): Promise<Answer> => {
 
 export const mostrarOfertas = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
-    console.log(payload)
     const id_cuidador = payload.id_usuario
-    console.log(id_cuidador)
 
     try {
         const ofertas = await Oferta.findBy({ cuidador: { id_usuario: id_cuidador } });
-        console.log(ofertas)
         if (ofertas.length > 0) {
             return {
                 data: ofertas,

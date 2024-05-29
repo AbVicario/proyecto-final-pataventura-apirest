@@ -75,7 +75,6 @@ export const loginTutor = async (c: any): Promise<Answer> => {
         body.password,
         tutor.password
     )
-    console.log(verifyPassword)
     if (!verifyPassword) {
         return {
             data: 'Invalid credentials',
@@ -90,7 +89,6 @@ export const loginTutor = async (c: any): Promise<Answer> => {
     }
 
     const token = await sign(tutorAutenticado, process.env.JWT_SECRET!!)
-    console.log(token)
     return {
         data: {
             token,
@@ -129,7 +127,6 @@ export const registroTutor = async (c: any): Promise<Answer> => {
 export const getCuidador = async (c: any): Promise<Answer> => {
     try {
         const payload = await c.get('jwtPayload');
-        console.log("Payload:", payload);
 
         const id_cuidador = payload.id_usuario;
 
@@ -157,10 +154,8 @@ export const getCuidador = async (c: any): Promise<Answer> => {
 export const getTutor = async (c: any): Promise<Answer> => {
     try {
         const payload = await c.get('jwtPayload');
-        console.log("Payload:", payload);
 
         const id_tutor = payload.id_usuario;
-        console.log("pinta", id_tutor)
 
         const tutor = await Tutor.findOneBy({ id_usuario: id_tutor });
 
@@ -175,7 +170,6 @@ export const getTutor = async (c: any): Promise<Answer> => {
             alias: tutor.alias,
             direccion: tutor.direccion
         }
-        console.log("tutorData: " + tutorData.id_usuario)
 
         return { data: tutorData, status: 200, ok: true };
     } catch (error) {
@@ -189,7 +183,6 @@ export const registroCuidador = async (c: any): Promise<Answer> => {
     try {
 
         const body = await c.req.json();
-        console.log(body)
         const cuidador = await crearCuidador(body, queryRunner);
         await queryRunner.commitTransaction()
         return { data: cuidador.id_usuario, status: 200, ok: true };
@@ -243,13 +236,11 @@ export const mostrarCuidadores = async (c: any): Promise<Answer> => {
 
 export const updateTutor = async (c: any): Promise<Answer> => {
     try {
-        console.log('entra en update tutor')
         const body = await c.req.json();
         const id = c.req.param('id_tutor')
         const tutor = await Tutor.findOneBy({ id_usuario: id });
 
         if (!tutor) {
-            console.log('tutor no existe')
             return {
                 data: "El tutor no existe",
                 status: 404,
@@ -273,7 +264,6 @@ export const updateTutor = async (c: any): Promise<Answer> => {
             }
 
             const tutorActualizado = await tutor.save();
-            console.log(tutorActualizado)
 
             if (tutorActualizado) {
                 const tutorData = {
@@ -287,7 +277,6 @@ export const updateTutor = async (c: any): Promise<Answer> => {
                     alias: tutorActualizado.alias,
                     direccion: tutorActualizado.direccion
                 }
-                console.log("TutorData = " + tutorData.id_usuario)
 
                 return {
                     data: tutorData,
@@ -412,7 +401,6 @@ export const getCuidadorByDistance = async (c: any): Promise<Answer> => {
                         ubicacion: JSON.stringify(ubicacionCuidador.coordenadas),
                         oferta: oferta
                     }
-                    console.log(cuidadorData)
                     cuidadoresByDistance.push(cuidadorData)
                 }
             }
@@ -445,7 +433,6 @@ export const getCuidadorByDistance = async (c: any): Promise<Answer> => {
 
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    console.log(lat1, lon1, lat2, lon2)
     const earthRadius = 6371.0; // Kilometers
     const dLat = toRadians(lat2 - lat1);
     const dLon = toRadians(lon2 - lon1);
