@@ -16,7 +16,7 @@ export const modificarNotificacion = async (c: any): Promise<Answer> => {
                 ok: false,
             };
         } else {
-            notificacion.estado= body.estado
+            notificacion.estado = body.estado
             const notificacionActualizada = await notificacion.save();
 
             if (notificacionActualizada) {
@@ -51,6 +51,8 @@ export const mostrarNotificaciones = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
     const id_usuario = payload.id_usuario
     const cliente = c.req.param('rol')
+    console.log(cliente)
+    console.log(id_usuario)
 
     try {
         let notificaciones = await Notificacion.createQueryBuilder("notificacion")
@@ -64,20 +66,22 @@ export const mostrarNotificaciones = async (c: any): Promise<Answer> => {
             .andWhere("notificacion.destinatario = :destinatario", { destinatario: cliente })
             .orderBy("notificacion.id_alerta", "DESC")
             .getMany()
-        
+
 
         if (notificaciones) {
+            console.log(notificaciones)
+
 
             const notificacionesData = notificaciones.map(notficacion => {
                 return {
-                    id_alerta : notficacion.id_alerta,
-                    fechaCracion : notficacion.fechaCreacion,
-                    estado : notficacion.estado,
-                    descripcion : notficacion.descripcion,
-                    demanda : notficacion.demanda,
-                    tipo : notficacion.demanda.oferta.tipo,
-                    direccion : notficacion.demanda.mascota.tutor.direccion,
-                    destinatario : notficacion.destinatario
+                    id_alerta: notficacion.id_alerta,
+                    fechaCracion: notficacion.fechaCreacion,
+                    estado: notficacion.estado,
+                    descripcion: notficacion.descripcion,
+                    demanda: notficacion.demanda,
+                    tipo: notficacion.demanda.oferta.tipo,
+                    direccion: notficacion.demanda.mascota.tutor.direccion,
+                    destinatario: notficacion.destinatario
                 };
             });
 
