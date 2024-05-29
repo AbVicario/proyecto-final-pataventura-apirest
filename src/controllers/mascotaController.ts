@@ -22,9 +22,9 @@ export const eliminarMascota = async (c: any): Promise<Answer> => {
         } else {
             if (mascota.demandas) {
                 for (const demanda of mascota.demandas) {
-                    if (demanda.estado.toLowerCase() == "aceptada"
-                        || demanda.estado.toLowerCase() == "pendiente") {
-                        demanda.estado = "cancelada_por_tutor"
+                    if (demanda.estado.toLowerCase() == "Aceptada"
+                        || demanda.estado.toLowerCase() == "Pendiente") {
+                        demanda.estado = "Cancelada tutor"
                         await queryRunner.manager.save(demanda)
                     }
                 }

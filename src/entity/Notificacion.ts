@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Demanda } from "./Demanda";
 
 @Entity()
@@ -12,10 +12,13 @@ export class Notificacion extends BaseEntity {
     @Column()
     estado: string
 
-    @Column()
-    descrpcion: string
+    @Column({ nullable: true })
+    descripcion: string
 
-    @OneToOne(() => Demanda)
+    @Column({ nullable: true })
+    destinatario: string
+
+    @ManyToOne(() => Demanda, demanda => demanda.notificaciones)
     @JoinColumn()
     demanda: Demanda
 

@@ -1,9 +1,10 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Cuidador } from "./Cuidador";
 import { Mascota } from "./Mascota";
 import { IsDate, IsNotEmpty, IsNumber } from "class-validator";
 import { Oferta } from "./Oferta";
 import { nullable } from "zod";
+import { Notificacion } from "./Notificacion";
 
 
 @Entity()
@@ -36,4 +37,7 @@ export class Demanda extends BaseEntity {
 
     @ManyToOne(() => Mascota, mascota => mascota.demandas)
     mascota: Mascota;
+
+    @OneToMany(() => Notificacion, notificacion => notificacion.demanda, { nullable: true })
+    notificaciones: Notificacion[];
 }

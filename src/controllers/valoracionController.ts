@@ -21,7 +21,7 @@ export const guardarValoracion = async (c: any): Promise<Answer> => {
             .getOne()
 
         //Este codigo debería realizarse automaticamente con un job
-        if (demanda.fechaFin < new Date() && demanda.estado === "Pendiente") {
+        if (demanda.fechaFin < new Date() && demanda.estado === "Aceptada") {
             demanda.estado = "Realizada"
             await demanda.save()
         }

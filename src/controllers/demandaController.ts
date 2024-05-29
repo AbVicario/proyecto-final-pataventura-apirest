@@ -19,7 +19,7 @@ export const eliminarDemanda = async (c: any): Promise<Answer> => {
                 ok: false,
             }
         } else {
-            if (demanda.estado === "Aceptada") {
+            if (demanda.estado == "Aceptada") {
                 return {
                     data: "No se puede eliminar esa demanda",
                     status: 404,
@@ -79,7 +79,7 @@ export const solicitarDemanda = async (c: any): Promise<Answer> => {
             }
         } else {
             const demanda = await crearDemanda(body, mascota, oferta, queryRunner)
-            await crearNotificacion("Tienes una nueva solicitud.", demanda, queryRunner)
+            await crearNotificacion("Tienes una nueva solicitud.", "cuidador", demanda, queryRunner)
             await queryRunner.commitTransaction()
             if (demanda) {
                 return {
@@ -108,9 +108,11 @@ export const solicitarDemanda = async (c: any): Promise<Answer> => {
 }
 
 export const modificarDemanda = async (c: any): Promise<Answer> => {
+    const body = await c.req.json();
+    const id = c.req.param('id_demanda')
+    const queryRunner = await queryRunnerCreate()
     try {
-        const body = await c.req.json();
-        const id = c.req.param('id_demanda')
+        
         const demanda = await Demanda.findOneBy({ id_demanda: id });
 
         if (!demanda) {
@@ -120,12 +122,36 @@ export const modificarDemanda = async (c: any): Promise<Answer> => {
                 ok: false,
             };
         } else {
-            if (demanda.estado === "Pendiente") {
-                demanda.fechaInicio = body.fechaInicio
-                demanda.fechaFin = body.fechaFin
-                demanda.descripcion = body.descripcion
-            }
+            
+            demanda.estado = body.estado
             const demandaActualizada = await demanda.save();
+
+            let descripcion = "";
+            let destinatario = "";
+            switch (body.estado) {
+                case "Aceptada":
+                    descripcion = "La demanda ha sido aceptada. Puedes verla en tu calendario";
+                    destinatario = "tutor";
+                    break;
+                case "Rechazada":
+                    descripcion = "La demanda ha sido rechazada por el cuidador";
+                    destinatario = "tutor";
+                    break;
+                case "Cancelada tutor":
+                    descripcion = "La demanda ha sido cancelada por el tutor";
+                    destinatario = "cuidador";
+                    break;
+                case "Cancelada cuidador":
+                    descripcion = "La demanda ha sido cancelada por el cuidador";
+                    destinatario = "tutor";
+                    break;
+                default:
+                    descripcion = "Estado desconocido.";
+                    destinatario =  "desconocido";
+                    break;
+            }
+            await crearNotificacion(descripcion, destinatario, demanda, queryRunner)
+            await queryRunner.commitTransaction()
 
             if (demandaActualizada) {
                 return {
@@ -143,12 +169,15 @@ export const modificarDemanda = async (c: any): Promise<Answer> => {
         }
 
     } catch (error) {
+        await queryRunner.rollbackTransaction()
         console.log('error:', error);
         return {
             data: error.message,
             status: 400,
             ok: false,
         };
+    } finally {
+        await queryRunner.release()
     }
 }
 

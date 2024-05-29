@@ -14,6 +14,7 @@ import valoracion from './routes/valoracionRoutes';
 import demanda from './routes/demandaRoutes';
 import oferta from './routes/ofertaRoutes';
 import ubicacion from './routes/ubicacionRoutes';
+import notificacion from './routes/notificacionRoutes';
 import { setupDataSource } from './db/connection';
 import { authMiddleware } from './middelware/authMiddleware.ts';
 import adminRoutes from './routes/adminRoutes';
@@ -83,6 +84,7 @@ export async function createApp(): Promise<OpenAPIHono> {
   app.route('/api/cliente/demanda', demanda);
   app.route('/api/cliente/oferta', oferta);
   app.route('/api/cliente/ubicacion', ubicacion);
+  app.route('/api/cliente/notificacion', notificacion);
 
   const port = parseInt(process.env.PORT) || 8000;
   console.log(`Server is running on  ${port}`);

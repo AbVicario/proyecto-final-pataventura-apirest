@@ -25,7 +25,7 @@ export abstract class Cliente extends Usuario {
     @IsNotEmpty({ message: 'El alias no puede estar en blanco' })
     alias: string
 
-    @Column({ unique: true })
+    @Column()
     @IsNotEmpty({ message: 'La direccion no puede estar en blanco' })
     direccion: string
 
