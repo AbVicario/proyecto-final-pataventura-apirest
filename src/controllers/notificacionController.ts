@@ -78,7 +78,7 @@ export const mostrarNotificaciones = async (c: any): Promise<Answer> => {
                     demanda : notificacion.demanda,
                     tipo : notificacion.demanda.oferta.tipo,
                     direccion : notificacion.demanda.mascota.tutor.direccion,
-                    destinatario : notificacion.destinatario
+                    mascotaName : notificacion.demanda.mascota.nombre
                 };
             });
 
