@@ -258,7 +258,7 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
             .innerJoinAndSelect("demanda.oferta", "oferta")
             .innerJoinAndSelect("oferta.cuidador", "cuidador")
             .where(`${cliente}.id_usuario = :id_usuario`, { id_usuario: id_usuario })
-            .andWhere("demanda.estado = :estado", { estado : "Aceptada"})
+            .andWhere("demanda.estado = :estado", { estado: "Aceptada" })
             .getMany()
 
         if (demandas) {
@@ -281,14 +281,14 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
 
                 const oferta = demanda.oferta
                 const ofertaData = {
-                    id_oferta : oferta.id_oferta,
-                    tipo : oferta.tipo,
-                    descripcion : oferta.descripcion,
-                    precio : oferta.precio,
-                    radio : oferta.radio,
-                    cuidador : cuidadorData
+                    id_oferta: oferta.id_oferta,
+                    tipo: oferta.tipo,
+                    descripcion: oferta.descripcion,
+                    precio: oferta.precio,
+                    radio: oferta.radio,
+                    cuidador: cuidadorData
                 }
-    
+
                 const tutor = demanda.mascota.tutor
                 const tutorData = {
                     id_usuario: tutor.id_usuario,
@@ -321,19 +321,19 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
                 };
 
                 return {
-                    id_demanda : demanda.id_demanda,
-                    fechaInicio : formatDate(fechaInicio),
-                    fechaFin : formatDate(fechaFin),
-                    descripcion : demanda.descripcion,
-                    precio : demanda.precio,
-                    estado : demanda,
-                    oferta : ofertaData,
-                    mascota : mascotaData,
+                    id_demanda: demanda.id_demanda,
+                    fechaInicio: formatDate(fechaInicio),
+                    fechaFin: formatDate(fechaFin),
+                    descripcion: demanda.descripcion,
+                    precio: demanda.precio,
+                    estado: demanda,
+                    oferta: ofertaData,
+                    mascota: mascotaData,
                 };
             });
 
             return {
-                data: demandas,
+                data: demandasData,
                 status: 200,
                 ok: true,
             }
