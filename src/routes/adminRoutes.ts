@@ -1,10 +1,14 @@
 
 import { Hono } from "hono"
-import { loginAdmin } from "../controllers/adminController"
+import { loginAdmin, registroAdmin } from "../controllers/adminController"
 
 const app = new Hono()
 app.post('/loginAdmin', async (c) => {
     const result = await loginAdmin(c)
+    return c.json({ data: result.data, ok: result.ok, status: result.status })
+})
+app.post('/registroAdmin', async (c) => {
+    const result = await registroAdmin(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
 export default app

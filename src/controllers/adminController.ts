@@ -3,9 +3,12 @@ import { verfifyPassword } from '../utils/auth'
 import { sign } from 'hono/jwt'
 import { setCookie } from 'hono/cookie'
 import { Administrador } from '../entity/Administrador'
+import { crearAdmin } from "../dao/administradorDao"
+import { queryRunnerCreate } from "../db/queryRunner"
 
 
 export const loginAdmin = async (c: any): Promise<Answer> => {
+    console.log("entra")
 
     const invalidCredentials: Answer = {
         data: 'Invalid Credentials',
@@ -61,3 +64,22 @@ export const loginAdmin = async (c: any): Promise<Answer> => {
         }
     }
 }
+
+export const registroAdmin = async (c: any): Promise<Answer> => {
+
+    const queryRunner = await queryRunnerCreate()
+
+    try {
+        const body = await c.req.json();
+        const admin = await crearAdmin(body, queryRunner);
+        await queryRunner.commitTransaction()
+        return { data: admin.id_usuario, status: 200, ok: true };
+
+    } catch (error) {
+        await queryRunner.rollbackTransaction()
+        return { data: error.message, status: 500, ok: false }
+
+    } finally {
+        await queryRunner.release()
+    }
+};
