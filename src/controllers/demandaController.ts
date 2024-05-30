@@ -285,8 +285,7 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
                     tipo: oferta.tipo,
                     descripcion: oferta.descripcion,
                     precio: oferta.precio,
-                    radio: oferta.radio,
-                    cuidador: cuidadorData
+                    radio: oferta.radio
                 }
 
                 const tutor = demanda.mascota.tutor
@@ -315,9 +314,7 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
                     raza: mascota.raza,
                     color: mascota.color,
                     observacion: mascota.observacion,
-                    sexo: mascota.sexo,
-                    tutor: tutorData,
-                    demandas: mascota.demandas
+                    sexo: mascota.sexo
                 };
 
                 return {
@@ -326,9 +323,11 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
                     fechaFin: formatDate(fechaFin),
                     descripcion: demanda.descripcion,
                     precio: demanda.precio,
-                    estado: demanda,
+                    estado: demanda.estado,
                     oferta: ofertaData,
                     mascota: mascotaData,
+                    tutor: tutorData,
+                    cuidador: cuidadorData
                 };
             });
 
