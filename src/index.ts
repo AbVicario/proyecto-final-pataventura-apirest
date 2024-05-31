@@ -77,6 +77,7 @@ export async function createApp(): Promise<OpenAPIHono> {
   app.route('/api/cliente', cliente);
   app.route('/', cliente);
   app.route('/', adminRoutes);
+  app.route('/api/admin', adminRoutes);
   app.route('/api/admin/tipo', tipoAdmin);
   app.route('/api/cliente/mascota', mascota);
   app.route('/api/cliente/tipo', tipoCliente);
