@@ -1,19 +1,17 @@
 import { Answer } from '../models/answer'
 import { verfifyPassword } from '../utils/auth'
 import { sign } from 'hono/jwt'
-import { setCookie } from 'hono/cookie'
 import { Administrador } from '../entity/Administrador'
 import { crearAdmin } from "../dao/administradorDao"
 import { queryRunnerCreate } from "../db/queryRunner"
-import { getManager } from 'typeorm'
 import { Tutor } from '../entity/Tutor'
-import { Client } from 'pg'
 import { Cliente } from '../entity/Cliente'
 import { Cuidador } from '../entity/Cuidador'
 import { Mascota } from '../entity/Mascota'
 import { Demanda } from '../entity/Demanda'
 import { Valoracion } from '../entity/Valoracion'
 import { Oferta } from '../entity/Oferta'
+import { dataSource } from '..'
 
 
 export const loginAdmin = async (c: any): Promise<Answer> => {
@@ -78,113 +76,113 @@ export const registroAdmin = async (c: any): Promise<Answer> => {
 
 
 export const mostrarEstadisticas = async (c: any): Promise<Answer> => {
-    const payload = await c.get('jwtPayload')
 
     try {
 
-        const nClientes = await getManager()
-            .createQueryBuilder(Cliente, "cliente")
-            .select("COUNT(cliente.id)", "total")
-            .getRawOne();
-
-        const nTutor = await getManager()
+        const nTutor = await dataSource
             .createQueryBuilder(Tutor, "tutor")
-            .select("COUNT(tutor.id)", "total")
+            .select("COUNT(tutor.id_usuario)", "total")
             .getRawOne();
 
-        const nPaseador = await getManager()
+        const nCuidador = await dataSource
             .createQueryBuilder(Cuidador, "cuidador")
-            .leftJoinAndSelect("cuidador.oferta", "oferta")
-            .select("COUNT(cuidador.id)", "total")
+            .select("COUNT(cuidador.id_usuario)", "total")
+            .getRawOne();
+
+        const nClientes = parseInt(nTutor.total) + parseInt(nCuidador.total)
+
+        const nPaseador = await dataSource
+            .createQueryBuilder(Cuidador, "cuidador")
+            .leftJoinAndSelect("cuidador.ofertas", "oferta")
+            .select("COUNT(cuidador.id_usuario)", "total")
             .where("oferta.tipo = :tipo", { tipo: "Paseo" })
             .getRawOne();
 
-        const nGuardian = await getManager()
+        const nGuardian = await dataSource
             .createQueryBuilder(Cuidador, "cuidador")
-            .leftJoinAndSelect("cuidador.oferta", "oferta")
-            .select("COUNT(cuidador.id)", "total")
+            .leftJoinAndSelect("cuidador.ofertas", "oferta")
+            .select("COUNT(cuidador.id_usuario)", "total")
             .where("oferta.tipo = :tipo", { tipo: "Guarderia" })
             .getRawOne();
 
-        const nMascotas = await getManager()
+        const nMascotas = await dataSource
             .createQueryBuilder(Mascota, "mascota")
-            .select("COUNT(mascota.id)", "total")
+            .select("COUNT(mascota.id_mascota)", "total")
             .getRawOne();
 
-        const mediaMascotas = await getManager()
+        const mediaMascotas = await dataSource
             .createQueryBuilder(Tutor, "tutor")
-            .leftJoinAndSelect("tutor.mascotas", "mascota")
             .select("AVG(mascota_count)", "average_pets")
             .from(subQuery => {
                 return subQuery
-                    .select("tutor.id", "tutor_id")
-                    .addSelect("COUNT(mascota.id)", "mascota_count")
-                    .from(Tutor, "tutor")
+                    .select("tutor.id_usuario", "tutor_id")
+                    .addSelect("COUNT(mascota.id_mascota)", "mascota_count")
+                    .from("tutor")
                     .leftJoin("tutor.mascotas", "mascota")
-                    .groupBy("tutor.id");
+                    .groupBy("tutor.id_usuario");
             }, "subQuery")
             .getRawOne();
 
 
-        const nPerros = await getManager()
+        const nPerros = await dataSource
             .createQueryBuilder(Mascota, "mascota")
-            .select("COUNT(mascota.id)", "total")
+            .select("COUNT(mascota.id_mascota)", "total")
             .where("mascota.tipo = :tipo", { tipo: "Perro" })
             .getRawOne();
 
-        const nGatos = await getManager()
+        const nGatos = await dataSource
             .createQueryBuilder(Mascota, "mascota")
-            .select("COUNT(mascota.id)", "total")
+            .select("COUNT(mascota.id_mascota)", "total")
             .where("mascota.tipo = :tipo", { tipo: "Gato" })
             .getRawOne();
 
 
-        const nServicios = await getManager()
+        const nServicios = await dataSource
             .createQueryBuilder(Demanda, "demanda")
-            .select("COUNT(demanda.id)", "total")
+            .select("COUNT(demanda.id_demanda)", "total")
             .getRawOne();
 
 
-        const nPaseos = await getManager()
+        const nPaseos = await dataSource
             .createQueryBuilder(Demanda, "demanda")
             .leftJoinAndSelect("demanda.oferta", "oferta")
-            .select("COUNT(demanda.id)", "total")
+            .select("COUNT(demanda.id_demanda)", "total")
             .where("oferta.tipo = :tipo", { tipo: "Paseo" })
             .andWhere("demanda.estado = :estado", { estado: "Realizada" })
             .getRawOne();
 
-        const nGuarderias = await getManager()
+        const nGuarderias = await dataSource
             .createQueryBuilder(Demanda, "demanda")
             .leftJoinAndSelect("demanda.oferta", "oferta")
-            .select("COUNT(demanda.id)", "total")
+            .select("COUNT(demanda.id_demanda)", "total")
             .where("oferta.tipo = :tipo", { tipo: "Guarderia" })
             .andWhere("demanda.estado = :estado", { estado: "Realizada" })
             .getRawOne();
 
 
-        const nValoraciones = await getManager()
+        const nValoraciones = await dataSource
             .createQueryBuilder(Valoracion, "valoracion")
-            .select("COUNT(valoracion.id)", "total")
+            .select("COUNT(valoracion.id_valoracion)", "total")
             .getRawOne();
 
-        const mediaValoraciones = await getManager()
+        const mediaValoraciones = await dataSource
             .createQueryBuilder(Valoracion, "valoracion")
             .select("AVG(valoracion.puntuacion)", "average")
             .getRawOne();
 
-        const precioMedioPaseo = await getManager()
+        const precioMedioPaseo = await dataSource
             .createQueryBuilder(Oferta, "oferta")
             .select("AVG(oferta.precio)", "average")
             .where("oferta.tipo = :tipo", { tipo: "Paseo" })
             .getRawOne();
 
-        const precioMedioGuarderia = await getManager()
+        const precioMedioGuarderia = await dataSource
             .createQueryBuilder(Oferta, "oferta")
             .select("AVG(oferta.precio)", "average")
             .where("oferta.tipo = :tipo", { tipo: "Guarderia" })
             .getRawOne();
 
-        const totalInvertidoPaseo = await getManager()
+        const totalInvertidoPaseo = await dataSource
             .createQueryBuilder(Demanda, "demanda")
             .leftJoinAndSelect("demanda.oferta", "oferta")
             .select("SUM(demanda.precio)", "total")
@@ -192,7 +190,7 @@ export const mostrarEstadisticas = async (c: any): Promise<Answer> => {
             .andWhere("demanda.estado = :estado", { estado: "Realizada" })
             .getRawOne();
 
-        const totalInvertidoGuarderia = await getManager()
+        const totalInvertidoGuarderia = await dataSource
             .createQueryBuilder(Demanda, "demanda")
             .leftJoinAndSelect("demanda.oferta", "oferta")
             .select("SUM(demanda.precio)", "total")
@@ -201,30 +199,31 @@ export const mostrarEstadisticas = async (c: any): Promise<Answer> => {
             .getRawOne();
 
 
-        const totalInvertido = await getManager()
+        const totalInvertido = await dataSource
             .createQueryBuilder(Demanda, "demanda")
             .select("SUM(demanda.precio)", "total")
+            .where("demanda.estado = :estado", { estado: "Realizada" })
             .getRawOne();
 
         let estadisticas = {
             nClientes: nClientes,
-            nTutor: nTutor,
-            nPaseador: nPaseador,
-            nGuardian: nGuardian,
-            nMascotas: nMascotas,
-            mediaMascotas: mediaMascotas,
-            nPerros: nPerros,
-            nGatos: nGatos,
-            nServicios: nServicios,
-            nPaseos: nPaseos,
-            nGuarderias: nGuarderias,
-            nValoraciones: nValoraciones,
-            mediaValoraciones: mediaValoraciones,
-            precioMedioPaseo: precioMedioPaseo,
-            precioMedioGuarderia: precioMedioGuarderia,
-            totalInvertidoPaseo: totalInvertidoPaseo,
-            totalInvertidoGuarderia: totalInvertidoGuarderia,
-            totalInvertido: totalInvertido
+            nTutor: parseInt(nTutor.total),
+            nPaseador: parseInt(nPaseador.total),
+            nGuardian: parseInt(nGuardian.total),
+            nMascotas: parseInt(nMascotas.total),
+            mediaMascotas: parseFloat(mediaMascotas.average_pets),
+            nPerros: parseInt(nPerros.total),
+            nGatos: parseInt(nGatos.total),
+            nServicios: parseInt(nServicios.total),
+            nPaseos: parseInt(nPaseos.total),
+            nGuarderias: parseInt(nGuarderias.total),
+            nValoraciones: parseInt(nValoraciones),
+            mediaValoraciones: parseFloat(mediaValoraciones.average),
+            precioMedioPaseo: parseFloat(precioMedioPaseo.average),
+            precioMedioGuarderia: parseFloat(precioMedioGuarderia.average),
+            totalInvertidoPaseo: parseFloat(totalInvertidoPaseo.total),
+            totalInvertidoGuarderia: parseFloat(totalInvertidoGuarderia.total),
+            totalInvertido: parseFloat(totalInvertido.total)
         }
 
         return {

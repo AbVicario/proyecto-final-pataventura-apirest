@@ -63,13 +63,13 @@ export async function createApp(): Promise<OpenAPIHono> {
     })
   )
 
-  app.use(
+  /*app.use(
     '/api/admin/*',
     jwt({
       secret: process.env.JWT_SECRET!!,
       cookie: 'jwt',
     })
-  )
+  )*/
 
   //const app = await createApp();
 
