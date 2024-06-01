@@ -14,14 +14,14 @@ export async function crearAdmin(body: any, queryRunner: QueryRunner): Promise<A
 
 export async function crearTipoMascota(body: any, queryRunner: QueryRunner): Promise<TipoMascota> {
     const tipoMascota = new TipoMascota();
-    tipoMascota.tipo_animal = body.tipo_animal.IsNotEmpty ? body.tipo_animal.IsNotEmpty : [];
-    tipoMascota.razas = [];
+    tipoMascota.tipo_mascota = body.tipo_mascota;
+    tipoMascota.razas = body.razas;
     return await queryRunner.manager.save(tipoMascota);
 }
 
 export async function crearTipoOferta(body: any, queryRunner: QueryRunner): Promise<TipoOferta> {
     const tipoOferta = new TipoOferta();
-    tipoOferta.tipo_servicio = body.tipo_servicio.IsNotEmpty ? body.tipo_servicio.IsNotEmpty : [];
-    tipoOferta.kilometros = [];
+    tipoOferta.tipo_oferta = body.tipo_oferta;
+    tipoOferta.kilometros = body.kilometros;
     return await queryRunner.manager.save(tipoOferta);
 }

@@ -7,9 +7,9 @@ export class TipoMascota extends BaseEntity {
     @PrimaryGeneratedColumn()
     id_tipoMascota: number
 
-    @Column()
+    @Column({ unique: true })
     @IsNotEmpty({ message: 'El tipo no puede estar en blanco' })
-    tipo_animal: string
+    tipo_mascota: string
 
     @Column("simple-array")
     razas: string[];

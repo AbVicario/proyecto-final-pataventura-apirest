@@ -7,9 +7,9 @@ export class TipoOferta extends BaseEntity {
     @PrimaryGeneratedColumn()
     id_tipoOferta: number
 
-    @Column()
+    @Column({ unique: true })
     @IsNotEmpty({ message: 'El tipo no puede estar en blanco' })
-    tipo_servicio: string
+    tipo_oferta: string
 
     @Column("simple-array")
     kilometros: string[];

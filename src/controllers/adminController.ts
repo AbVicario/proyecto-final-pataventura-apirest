@@ -318,7 +318,7 @@ export const modificarTipoMascotaAdmin = async (c: any): Promise<Answer> => {
             };
         } else {
 
-            tipoMascota.tipo_animal = body.tipo_animal;
+            tipoMascota.tipo_mascota = body.tipo_animal;
             tipoMascota.razas = body.razas;
 
             const mascotaActualizada = await tipoMascota.save();
@@ -363,7 +363,7 @@ export const modificarTipoOfertaAdmin = async (c: any): Promise<Answer> => {
             };
         } else {
 
-            tipoOferta.tipo_servicio = body.tipo_servicio;
+            tipoOferta.tipo_oferta = body.tipo_servicio;
             tipoOferta.kilometros = body.kilometros;
 
             const tipoOfertaActualizada = await tipoOferta.save();
