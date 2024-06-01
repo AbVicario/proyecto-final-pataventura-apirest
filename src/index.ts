@@ -73,7 +73,7 @@ export async function createApp(): Promise<OpenAPIHono> {
 
   //const app = await createApp();
 
-  app.use('/api/*', authMiddleware);
+  app.use('/api/cliente/*', authMiddleware);
   app.route('/api/cliente', cliente);
   app.route('/', cliente);
   app.route('/', adminRoutes);

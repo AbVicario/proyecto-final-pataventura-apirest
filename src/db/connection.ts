@@ -15,7 +15,8 @@ import { Tutor } from '../entity/Tutor';
 import { Cuidador } from '../entity/Cuidador';
 import { Oferta } from '../entity/Oferta';
 import { Notificacion } from '../entity/Notificacion';
-import { Tipo } from '../entity/Tipo';
+import { TipoMascota } from '../entity/TipoMascota';
+import { TipoOferta } from '../entity/TipoOferta';
 
 export async function setupDataSource(): Promise<DataSource> {
     return new DataSource({
@@ -28,7 +29,7 @@ export async function setupDataSource(): Promise<DataSource> {
         synchronize: true,
         logging: false,
         entities: [Usuario, Administrador, Cliente, Valoracion, Mascota, Contrato, Demanda, Notificacion,
-            Oferta, Cuidador, Tutor, Ubicacion, Tipo],
+            Oferta, Cuidador, Tutor, Ubicacion, TipoMascota, TipoOferta],
         migrations: [],
         subscribers: [],
     });

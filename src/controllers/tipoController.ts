@@ -1,8 +1,9 @@
 import { crearTipoDao } from "../dao/tipoDao"
 import { queryRunnerCreate } from "../db/queryRunner"
-import { Tipo } from "../entity/Tipo"
+//import { Tipo } from "../entity/Tipo"
 import { Answer } from "../models/answer"
 
+/*
 export const crearTipo = async (c: any): Promise<Answer> => {
     const body = await c.req.json()
     const queryRunner = await queryRunnerCreate()
@@ -69,4 +70,4 @@ export const mostrarTipos = async (c: any): Promise<Answer> => {
             ok: false,
         }
     }
-}
+}*/
