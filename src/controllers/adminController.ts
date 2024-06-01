@@ -12,49 +12,67 @@ import { Demanda } from '../entity/Demanda'
 import { Valoracion } from '../entity/Valoracion'
 import { Oferta } from '../entity/Oferta'
 import { dataSource } from '..'
+import { setCookie } from 'hono/cookie'
 import { TipoMascota } from '../entity/TipoMascota'
 import { TipoOferta } from '../entity/TipoOferta'
 
 
 export const loginAdmin = async (c: any): Promise<Answer> => {
-    const body = (await c.req.json())
+    console.log("entra")
 
-    const admin = await Administrador.findOneBy({
-        email: body.email
-    })
-    if (!admin) {
-        return {
-            data: 'Email no encontrado',
-            status: 401,
-            ok: false,
-        }
+    const invalidCredentials: Answer = {
+        data: 'Invalid Credentials',
+        status: 401,
+        ok: false,
     }
 
-    const verifyPassword = await verfifyPassword(
-        body.password,
-        admin.password
-    )
-    if (!verifyPassword) {
+    const body = await c.req.json()
+
+
+    try {
+        const administrador = await Administrador.findOneBy({
+            email: body.email,
+        })
+
+        if (!administrador) {
+            return invalidCredentials
+        }
+
+        const verifyPassword = await verfifyPassword(
+            body.password,
+            administrador.password
+        )
+
+        if (!verifyPassword) {
+            return invalidCredentials
+        }
+
+        const administradorAutenticado = {
+            id_administrador: administrador.id_usuario
+        }
+
+        setCookie(
+            c,
+            'jwt',
+            await sign(administradorAutenticado, process.env.JWT_SECRET!!),
+            {
+                sameSite: 'Lax',
+                path: '/',
+            }
+        )
         return {
-            data: 'Invalid credentials',
+            data: 'Inicio de sesion correcto',
+            status: 200,
+            ok: true,
+        }
+    } catch (error) {
+        return {
+            data: 'error',
             status: 422,
             ok: false,
         }
     }
 
-    const adminAutenticado = {
-        id_usuario: admin.id_usuario,
-        tipo: "Administrador"
-    }
-
-    const token = await sign(adminAutenticado, process.env.JWT_SECRET!!)
-    return {
-        data: {
-            token,
-        },
-        status: 200,
-        ok: true,
-    }
 }
 
 export const registroAdmin = async (c: any): Promise<Answer> => {
