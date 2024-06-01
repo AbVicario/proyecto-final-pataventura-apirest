@@ -2,17 +2,16 @@ import { IsNotEmpty } from "class-validator";
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class Tipo extends BaseEntity {
+export class TipoOferta extends BaseEntity {
 
     @PrimaryGeneratedColumn()
-    id_tipo: number
+    id_tipoOferta: number
 
     @Column()
     @IsNotEmpty({ message: 'El tipo no puede estar en blanco' })
-    tipo_animal: string
+    tipo_servicio: string
 
-    @Column()
-    @IsNotEmpty({ message: 'La raza no puede estar en blanco' })
-    raza: string
+    @Column("simple-array")
+    kilometros: string[];
 
 }
