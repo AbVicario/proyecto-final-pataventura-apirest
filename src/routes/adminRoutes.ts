@@ -1,6 +1,6 @@
 
 import { Hono } from "hono"
-import { eliminarTipoMascota, eliminarTipoOferta, loginAdmin, modificarTipoMascotaAdmin, modificarTipoOfertaAdmin, mostrarEstadisticas, registroAdmin, registroTipoMascotaAdmin, registroTipoOfertaAdmin } from "../controllers/adminController"
+import { eliminarTipoMascota, eliminarTipoOferta, loginAdmin, modificarTipoMascotaAdmin, modificarTipoOfertaAdmin, mostrarEstadisticas, mostrarTiposMascota, mostrarTiposOferta, registroAdmin, registroTipoMascotaAdmin, registroTipoOfertaAdmin } from "../controllers/adminController"
 
 const app = new Hono()
 app.post('/loginAdmin', async (c) => {
@@ -44,6 +44,16 @@ app.delete('/eliminaTipoMascota/:id_tipoMascota', async (c) => {
 
 app.delete('/eliminaTipoOferta/:id_tipoOferta', async (c) => {
     const result = await eliminarTipoOferta(c)
+    return c.json({ data: result.data, ok: result.ok, status: result.status })
+})
+
+app.get('/tiposMascota', async (c) => {
+    const result = await mostrarTiposMascota(c)
+    return c.json({ data: result.data, ok: result.ok, status: result.status })
+})
+
+app.get('/tiposOferta', async (c) => {
+    const result = await mostrarTiposOferta(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
 

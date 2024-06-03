@@ -474,3 +474,63 @@ export const eliminarTipoOferta = async (c: any): Promise<Answer> => {
         await queryRunner.release()
     }
 }
+
+export const mostrarTiposMascota = async (c: any): Promise<Answer> => {
+
+    try {
+
+        const tiposMascota = await TipoMascota.find()
+
+        if (tiposMascota) {
+            return {
+                data: tiposMascota,
+                status: 200,
+                ok: true,
+            }
+        } else {
+            return {
+                data: "No hay tipos de mascota",
+                status: 404,
+                ok: false,
+            }
+        }
+
+    } catch (error) {
+
+        return {
+            data: error,
+            status: 400,
+            ok: false,
+        }
+    }
+}
+
+export const mostrarTiposOferta = async (c: any): Promise<Answer> => {
+
+    try {
+
+        const tiposOferta = await TipoOferta.find()
+
+        if (tiposOferta) {
+            return {
+                data: tiposOferta,
+                status: 200,
+                ok: true,
+            }
+        } else {
+            return {
+                data: "No hay tipos de oferta",
+                status: 404,
+                ok: false,
+            }
+        }
+
+    } catch (error) {
+
+        return {
+            data: error,
+            status: 400,
+            ok: false,
+        }
+    }
+}
