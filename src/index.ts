@@ -7,7 +7,6 @@ import "reflect-metadata";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import mascota from './routes/mascotaRoutes';
-import tipoAdmin from './routes/tipoAdminRoutes';
 import tipoCliente from './routes/tipoClienteRoutes';
 import cliente from './routes/clienteRoutes';
 import valoracion from './routes/valoracionRoutes';
@@ -18,11 +17,6 @@ import notificacion from './routes/notificacionRoutes';
 import { setupDataSource } from './db/connection';
 import { authMiddleware } from './middelware/authMiddleware.ts';
 import adminRoutes from './routes/adminRoutes';
-
-
-
-
-
 
 export let dataSource;
 
@@ -78,7 +72,6 @@ export async function createApp(): Promise<OpenAPIHono> {
   app.route('/', cliente);
   app.route('/', adminRoutes);
   app.route('/api/admin', adminRoutes);
-  app.route('/api/admin/tipo', tipoAdmin);
   app.route('/api/cliente/mascota', mascota);
   app.route('/api/cliente/tipo', tipoCliente);
   app.route('/api/cliente/valoracion', valoracion);
