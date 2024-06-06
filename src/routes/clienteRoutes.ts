@@ -4,6 +4,7 @@ import {
     updateTutor, updateCuidador, getCuidador, getTutor, getCuidadorByDistance
 } from "../controllers/clienteController"
 import { log } from "console"
+import { mostrarTiposMascota, mostrarTiposOferta } from "../controllers/adminController"
 
 const app = new Hono()
 
@@ -56,6 +57,16 @@ app.put('/updateCuidador/:id_cuidador', async (c) => {
 
 app.get('/cuidadorByDistance', async (c) => {
     const result = await getCuidadorByDistance(c)
+    return c.json({ data: result.data, ok: result.ok, status: result.status })
+})
+
+app.get('/tiposMascota', async (c) => {
+    const result = await mostrarTiposMascota(c)
+    return c.json({ data: result.data, ok: result.ok, status: result.status })
+})
+
+app.get('/tiposOferta', async (c) => {
+    const result = await mostrarTiposOferta(c)
     return c.json({ data: result.data, ok: result.ok, status: result.status })
 })
 
