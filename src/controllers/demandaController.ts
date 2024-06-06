@@ -4,6 +4,7 @@ import { queryRunnerCreate } from "../db/queryRunner";
 import { Demanda } from "../entity/Demanda";
 import { Mascota } from "../entity/Mascota";
 import { Oferta } from "../entity/Oferta";
+import { Valoracion } from "../entity/Valoracion";
 import { Answer } from "../models/answer";
 
 export const eliminarDemanda = async (c: any): Promise<Answer> => {
@@ -464,12 +465,11 @@ export const mostrarDemandasRealizadasCuidador = async (c: any): Promise<Answer>
 }
 
 export const mostrarDemandasRealizadasMascota = async (c: any): Promise<Answer> => {
-    const payload = await c.get('jwtPayload')
-    const id_usuario = payload.id_usuario
-    const id_mascota = c.req.param('id_mascota')
+    const payload = await c.get('jwtPayload');
+    const id_usuario = payload.id_usuario;
+    const id_mascota = c.req.param('id_mascota');
 
     try {
-
         let demandas = await Demanda.createQueryBuilder("demanda")
             .innerJoinAndSelect("demanda.mascota", "mascota")
             .innerJoinAndSelect("mascota.tutor", "tutor")
@@ -477,14 +477,37 @@ export const mostrarDemandasRealizadasMascota = async (c: any): Promise<Answer> 
             .innerJoinAndSelect("oferta.cuidador", "cuidador")
             .where("mascota.id_mascota = :id_mascota", { id_mascota: id_mascota })
             .andWhere("demanda.estado = :estado", { estado: "Realizada" })
-            .getMany()
+            .getMany();
 
-        if (demandas) {
+        if (demandas.length > 0) {
+            const demandasData = await Promise.all(demandas.map(async demanda => {
+                const valoraciones = await Valoracion.createQueryBuilder("valoracion")
+                    .innerJoinAndSelect("valoracion.demanda", "demanda")
+                    .innerJoinAndSelect("demanda.oferta", "oferta")
+                    .innerJoinAndSelect("oferta.cuidador", "cuidador")
+                    .innerJoinAndSelect("demanda.mascota", "mascota")
+                    .innerJoinAndSelect("mascota.tutor", "tutor")
+                    .where("cuidador.id_usuario = :id_usuario", { id_usuario: demanda.oferta.cuidador.id_usuario })
+                    .orderBy("valoracion.id_valoracion", "DESC")
+                    .getMany();
 
-            const demandasData = demandas.map(demanda => {
-                const fechaInicio = new Date(demanda.fechaInicio)
-                const fechaFin = new Date(demanda.fechaFin)
-                const cuidador = demanda.oferta.cuidador
+                let valoracionesData = [];
+                if (valoraciones.length > 0) {
+                    valoracionesData = valoraciones.map(valoracion => {
+                        const imagenTutorArray = valoracion.demanda.mascota.tutor.imagen ? Array.from(valoracion.demanda.mascota.tutor.imagen) : null;
+                        return {
+                            id_valoracion: valoracion.id_valoracion,
+                            puntuacion: valoracion.puntuacion,
+                            descripcion: valoracion.descripcion,
+                            alias_tutor: valoracion.demanda.mascota.tutor.alias,
+                            imagen_tutor: imagenTutorArray
+                        };
+                    });
+                }
+
+                const fechaInicio = new Date(demanda.fechaInicio);
+                const fechaFin = new Date(demanda.fechaFin);
+                const cuidador = demanda.oferta.cuidador;
                 const cuidadorData = {
                     id_usuario: cuidador.id_usuario,
                     email: cuidador.email,
@@ -494,19 +517,20 @@ export const mostrarDemandasRealizadasMascota = async (c: any): Promise<Answer> 
                     apellido: cuidador.apellido,
                     imagen: cuidador.imagen ? Array.from(cuidador.imagen) : null,
                     alias: cuidador.alias,
-                    direccion: cuidador.direccion
-                }
+                    direccion: cuidador.direccion,
+                    valoraciones: valoracionesData
+                };
 
-                const oferta = demanda.oferta
+                const oferta = demanda.oferta;
                 const ofertaData = {
                     id_oferta: oferta.id_oferta,
                     tipo: oferta.tipo,
                     descripcion: oferta.descripcion,
                     precio: oferta.precio,
                     radio: oferta.radio
-                }
+                };
 
-                const tutor = demanda.mascota.tutor
+                const tutor = demanda.mascota.tutor;
                 const tutorData = {
                     id_usuario: tutor.id_usuario,
                     email: tutor.email,
@@ -514,12 +538,12 @@ export const mostrarDemandasRealizadasMascota = async (c: any): Promise<Answer> 
                     telefono: tutor.telefono,
                     nombre: tutor.nombre,
                     apellido: tutor.apellido,
-                    imagen: tutor.imagen ? Array.from(cuidador.imagen) : null,
+                    imagen: tutor.imagen ? Array.from(tutor.imagen) : null,
                     alias: tutor.alias,
                     direccion: tutor.direccion
-                }
+                };
 
-                const mascota = demanda.mascota
+                const mascota = demanda.mascota;
                 const mascotaData = {
                     id_mascota: mascota.id_mascota,
                     nombre: mascota.nombre,
@@ -535,6 +559,8 @@ export const mostrarDemandasRealizadasMascota = async (c: any): Promise<Answer> 
                     sexo: mascota.sexo
                 };
 
+                const isValorada = valoraciones.some(valoracion => valoracion.demanda.id_demanda === demanda.id_demanda);
+
                 return {
                     id_demanda: demanda.id_demanda,
                     fechaInicio: formatDate(fechaInicio),
@@ -545,32 +571,35 @@ export const mostrarDemandasRealizadasMascota = async (c: any): Promise<Answer> 
                     oferta: ofertaData,
                     mascota: mascotaData,
                     tutor: tutorData,
-                    cuidador: cuidadorData
+                    cuidador: cuidadorData,
+                    isValorada: isValorada
                 };
-            });
+            }));
+
+            console.log(demandasData);
 
             return {
                 data: demandasData,
                 status: 200,
-                ok: true,
-            }
+                ok: true
+            };
         } else {
             return {
-                data: "No se encuentran demandas ",
+                data: "No se encuentran demandas",
                 status: 404,
-                ok: false,
-            }
+                ok: false
+            };
         }
-
     } catch (error) {
-        console.log('error:' + error)
+        console.log('error:' + error);
         return {
             data: error,
             status: 400,
-            ok: false,
-        }
+            ok: false
+        };
     }
-}
+};
+
 
 
 function formatDate(date: Date): string {
