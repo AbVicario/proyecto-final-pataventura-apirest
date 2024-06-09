@@ -136,6 +136,7 @@ export const modificarMascota = async (c: any): Promise<Answer> => {
             mascota.tipo = body.tipo;
             mascota.observacion = body.observacion;
             mascota.sexo = body.sexo;
+            mascota.num_chip = body.num_chip;
 
             const mascotaActualizada = await mascota.save();
 
