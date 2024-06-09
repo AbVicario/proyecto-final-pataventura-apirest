@@ -250,6 +250,8 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
     const payload = await c.get('jwtPayload')
     const id_usuario = payload.id_usuario
     const cliente = c.req.param('rol')
+    console.log(id_usuario)
+    console.log(cliente)
 
     try {
 
@@ -260,7 +262,10 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
             .innerJoinAndSelect("oferta.cuidador", "cuidador")
             .where(`${cliente}.id_usuario = :id_usuario`, { id_usuario: id_usuario })
             .andWhere("demanda.estado = :estado", { estado: "Aceptada" })
+            .andWhere("demanda.fechaInicio >= :today", { today: new Date() })
             .getMany()
+
+        console.log(demandas)
 
         if (demandas) {
 
@@ -331,6 +336,7 @@ export const mostrarDemandasAceptadas = async (c: any): Promise<Answer> => {
                     cuidador: cuidadorData
                 };
             });
+            console.log(demandasData)
 
             return {
                 data: demandasData,
