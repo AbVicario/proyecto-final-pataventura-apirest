@@ -20,11 +20,6 @@ export const guardarValoracion = async (c: any): Promise<Answer> => {
             .where("demanda.id_demanda = :id_demanda", { id_demanda: id_demanda })
             .getOne()
 
-        //Este codigo debería realizarse automaticamente con un job
-        if (demanda.fechaFin < new Date() && demanda.estado === "Aceptada") {
-            demanda.estado = "Realizada"
-            await demanda.save()
-        }
 
         if (demanda.mascota.tutor.id_usuario == id_tutor) {
             if (demanda.estado === "Cancelada por cuidador" || demanda.estado === "Realizada") {
