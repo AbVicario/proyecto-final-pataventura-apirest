@@ -17,20 +17,19 @@ import notificacion from './routes/notificacionRoutes';
 import { setupDataSource } from './db/connection';
 import { authMiddleware } from './middelware/authMiddleware.ts';
 import adminRoutes from './routes/adminRoutes';
+import './jobs/dailyJob';
 
 export let dataSource;
 
 export async function createApp(): Promise<OpenAPIHono> {
   let app = new OpenAPIHono();
-
-  app.get(
-    "/docs",
-    swaggerUI({
-      url: "/doc",
-    })
-  );
-
-  // declareRoutes(app);
+  /*
+    app.get(
+      "/docs",
+      swaggerUI({
+        url: "/doc",
+      })
+    );*/
 
   app.doc("/doc", {
     info: {

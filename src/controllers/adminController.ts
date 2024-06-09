@@ -18,7 +18,6 @@ import { TipoOferta } from '../entity/TipoOferta'
 
 
 export const loginAdmin = async (c: any): Promise<Answer> => {
-    console.log("entra")
 
     const invalidCredentials: Answer = {
         data: 'Invalid Credentials',

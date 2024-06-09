@@ -16,6 +16,7 @@
     "dotenv": "^16.4.5",
     "hono": "^4.0.9",
     "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.9.2",
