@@ -1,7 +1,6 @@
-import { Entity, Column, OneToMany, PrimaryGeneratedColumn, Unique, BaseEntity, ChildEntity, TableInheritance } from "typeorm"
+import { Entity, Column } from "typeorm"
 import { Usuario } from "./Usuario"
 import { IsNotEmpty } from "class-validator"
-import { Ubicacion } from "./Ubicacion"
 
 @Entity()
 export abstract class Cliente extends Usuario {

@@ -5,7 +5,6 @@ import { jwt } from 'hono/jwt'
 import 'dotenv/config';
 import "reflect-metadata";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { swaggerUI } from "@hono/swagger-ui";
 import mascota from './routes/mascotaRoutes';
 import tipoCliente from './routes/tipoClienteRoutes';
 import cliente from './routes/clienteRoutes';
@@ -23,13 +22,6 @@ export let dataSource;
 
 export async function createApp(): Promise<OpenAPIHono> {
   let app = new OpenAPIHono();
-  /*
-    app.get(
-      "/docs",
-      swaggerUI({
-        url: "/doc",
-      })
-    );*/
 
   app.doc("/doc", {
     info: {
@@ -79,7 +71,7 @@ export async function createApp(): Promise<OpenAPIHono> {
   app.route('/api/cliente/ubicacion', ubicacion);
   app.route('/api/cliente/notificacion', notificacion);
 
-  const port = parseInt(process.env.PORT) || 8000;
+  const port = parseInt(process.env.PORT) || 5432;
   console.log(`Server is running on  ${port}`);
 
   serve({
