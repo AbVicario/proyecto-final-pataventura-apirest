@@ -71,12 +71,13 @@ export async function createApp(): Promise<OpenAPIHono> {
   app.route('/api/cliente/ubicacion', ubicacion);
   app.route('/api/cliente/notificacion', notificacion);
 
-  const port = parseInt(process.env.PORT) || 4000;
+  const port = parseInt(process.env.PORT) || 10000;
   console.log(`Server is running on  ${port}`);
 
   serve({
     fetch: app.fetch,
-    port: Number(process.env.PORT),
+    port: port,
+    hostname: "0.0.0.0"
   });
   console.log(`API URL => https://proyecto-final-pataventura-apirest.onrender.com:${port}`);
 })();
