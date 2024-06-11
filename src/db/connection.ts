@@ -21,7 +21,7 @@ import { TipoOferta } from '../entity/TipoOferta';
 export async function setupDataSource(): Promise<DataSource> {
     return new DataSource({
         type: "postgres",
-        host: "localhost",
+        host: "dpg-cpk17en109ks73eu51s0-a",
         port: 5432,
         username: process.env.DB_USER,
         password: process.env.DB_PASS,
