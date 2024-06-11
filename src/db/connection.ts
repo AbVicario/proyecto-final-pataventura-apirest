@@ -25,7 +25,7 @@ export async function setupDataSource(): Promise<DataSource> {
         port: 5432,
         username: process.env.DB_USER,
         password: process.env.DB_PASS,
-        database: "pataventura",
+        database: "pataventura_m1gt",
         synchronize: true,
         logging: false,
         entities: [Usuario, Administrador, Cliente, Valoracion, Mascota, Contrato, Demanda, Notificacion,
