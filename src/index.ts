@@ -42,49 +42,52 @@ export async function createApp(): Promise<OpenAPIHono> {
   return app;
 }
 
-(async () => {
-  dataSource = await setupDataSource();
-  await dataSource.initialize();
-  const app = new Hono()
 
-  app.use(
-    '/api/*',
-    cors({
-      origin: '*',
-      allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
-      credentials: true,
-    })
-  )
 
-  app.use(
-    '/api/admin/*',
-    jwt({
-      secret: process.env.JWT_SECRET!!,
-      cookie: 'jwt',
-    })
-  )
+export const app = new Hono()
 
-  //const app = await createApp();
+app.use(
+  '/api/*',
+  cors({
+    origin: '*',
+    allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE'],
+    credentials: true,
+  })
+)
 
-  app.use('/api/cliente/*', authMiddleware);
-  app.route('/api/cliente', cliente);
-  app.route('/', cliente);
-  app.route('/', adminRoutes);
-  app.route('/api/admin', adminRoutes);
-  app.route('/api/cliente/mascota', mascota);
-  app.route('/api/cliente/tipo', tipoCliente);
-  app.route('/api/cliente/valoracion', valoracion);
-  app.route('/api/cliente/demanda', demanda);
-  app.route('/api/cliente/oferta', oferta);
-  app.route('/api/cliente/ubicacion', ubicacion);
-  app.route('/api/cliente/notificacion', notificacion);
+app.use(
+  '/api/admin/*',
+  jwt({
+    secret: process.env.JWT_SECRET!!,
+    cookie: 'jwt',
+  })
+)
 
-  const port = parseInt(process.env.PORT) || 8000;
-  console.log(`Server is running on  ${port}`);
+//const app = await createApp();
 
-  serve({
-    fetch: app.fetch,
-    port,
-  });
-  console.log(`API URL => http://localhost:${port}`);
-})();
+app.use('/api/cliente/*', authMiddleware);
+app.route('/api/cliente', cliente);
+app.route('/', cliente);
+app.route('/', adminRoutes);
+app.route('/api/admin', adminRoutes);
+app.route('/api/cliente/mascota', mascota);
+app.route('/api/cliente/tipo', tipoCliente);
+app.route('/api/cliente/valoracion', valoracion);
+app.route('/api/cliente/demanda', demanda);
+app.route('/api/cliente/oferta', oferta);
+app.route('/api/cliente/ubicacion', ubicacion);
+app.route('/api/cliente/notificacion', notificacion);
+
+const port = parseInt(process.env.PORT) || 8000;
+console.log(`Server is running on  ${port}`);
+
+serve({
+  fetch: app.fetch,
+  port,
+});
+
+setupDataSource().then((ds) => {
+  dataSource = ds;
+  ds.initialize();
+})
+console.log(`API URL => http://localhost:${port}`);
