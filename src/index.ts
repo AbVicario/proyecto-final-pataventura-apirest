@@ -76,7 +76,7 @@ export async function createApp(): Promise<OpenAPIHono> {
 
   serve({
     fetch: app.fetch,
-    port,
+    port: Number(process.env.PORT),
   });
-  console.log(`API URL => http://localhost:${port}`);
+  console.log(`API URL => https://proyecto-final-pataventura-apirest.onrender.com:${port}`);
 })();
