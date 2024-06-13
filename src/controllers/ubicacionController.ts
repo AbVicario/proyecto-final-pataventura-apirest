@@ -12,13 +12,9 @@ export const guardarUbicacionCuidador = async (c: any): Promise<Answer> => {
     const body = await c.req.json()
     const queryRunner = await queryRunnerCreate()
     try {
+
         const cuidador = await Cuidador.findOneBy({ id_usuario: id_cuidador })
-
         const ubicacion = await Ubicacion.findOneBy({ cuidador: { id_usuario: id_cuidador } })
-
-        if (ubicacion) {
-            await Ubicacion.remove(ubicacion)
-        }
 
         let ubicacionNew = null
         if (ubicacion) {
